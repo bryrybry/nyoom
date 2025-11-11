@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:nyoom/themes/colors.dart';
+import 'package:nyoom/pages/bookmarks/bookmarks.dart';
+import 'package:nyoom/pages/bus_times/bus_times.dart';
+import 'package:nyoom/pages/travel_routes/travel_routes.dart';
+import 'package:nyoom/pages/settings/settings.dart';
 
 void main() {
   runApp(const MyApp());
@@ -7,116 +12,107 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Nyoom',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        brightness: Brightness.light,
+        scaffoldBackgroundColor: AppColors.mainBackgroundLight,
+        colorScheme: ColorScheme.light(
+          primary: AppColors.nyoomYellowLight,
+          onPrimary: AppColors.white,
+          secondary: AppColors.nyoomBlue,
+          onSecondary: AppColors.white,
+          tertiary: AppColors.nyoomGreen,
+          onTertiary: AppColors.white,
+          surface: AppColors.buttonPanelLight,
+          onSurface: AppColors.hintGrayLight,
+          error: AppColors.errorRed,
+          onError: AppColors.white,
+          outline: AppColors.darkGrayLight,
+        ),
       ),
-      home: const MyHomePage(title: 'nyoooooom'),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: AppColors.mainBackgroundDark,
+        colorScheme: ColorScheme.dark(
+          primary: AppColors.mainBackgroundDark,
+          onPrimary: AppColors.nyoomYellowDark,
+          secondary: AppColors.mainBackgroundDark,
+          onSecondary: AppColors.nyoomBlue,
+          tertiary: AppColors.mainBackgroundDark,
+          onTertiary: AppColors.nyoomGreen,
+          surface: AppColors.buttonPanelDark,
+          onSurface: AppColors.hintGrayDark,
+          error: AppColors.errorRed,
+          onError: AppColors.white,
+          outline: AppColors.darkGrayDark,
+        ),
+      ),
+      themeMode: ThemeMode.dark,
+      home: const Main(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class Main extends StatefulWidget {
+  const Main({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<Main> createState() => _MainPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _MainPageState extends State<Main> {
+  int _currentIndex = 0;
 
-  void _incrementCounter() {
+  final List<Widget> _pages = const [
+    Bookmarks(),
+    BusTimes(),
+    TravelRoutes(),
+    Settings(),
+  ];
+    final List<Color> _pageColors = const [
+    AppColors.nyoomYellowLight,
+    AppColors.nyoomBlue,
+    AppColors.nyoomGreen,
+    AppColors.darkGrayLight,
+  ];
+
+  void _onTabTapped(int index) {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      _currentIndex = index;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+      body: _pages[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        selectedItemColor: _pageColors[_currentIndex],
+        onTap: _onTabTapped,
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bookmark),
+            label: 'Bookmarks',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.directions_bus),
+            label: 'Bus Times',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.location_pin),
+            label: 'Travel Routes'
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
+        ],
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
