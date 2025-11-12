@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class BusTimes extends StatefulWidget {
+class BusTimes extends ConsumerStatefulWidget {
   const BusTimes({super.key});
 
   @override
-  State<BusTimes> createState() => _BookmarksState();
+  ConsumerState<BusTimes> createState() => _BookmarksState();
 }
 
-class _BookmarksState extends State<BusTimes> {
+class _BookmarksState extends ConsumerState<BusTimes> {
   @override
   Widget build(BuildContext context) {
     return Center(

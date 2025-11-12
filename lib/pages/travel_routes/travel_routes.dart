@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nyoom/main.dart';
 
-class TravelRoutes extends StatefulWidget {
+class TravelRoutes extends ConsumerStatefulWidget implements HasPageTitle {
   const TravelRoutes({super.key});
 
   @override
-  State<TravelRoutes> createState() => _BookmarksState();
+  ConsumerState<TravelRoutes> createState() => _BookmarksState();
+  
+  @override
+  String? get pageTitle => "Find a Route";
 }
 
-class _BookmarksState extends State<TravelRoutes> {
+class _BookmarksState extends ConsumerState<TravelRoutes> {
   @override
   Widget build(BuildContext context) {
     return Center(

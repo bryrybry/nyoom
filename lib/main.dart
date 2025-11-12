@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:nyoom/app_state.dart';
 import 'package:nyoom/themes/colors.dart';
 import 'package:nyoom/pages/bookmarks/bookmarks.dart';
 import 'package:nyoom/pages/bus_times/bus_times.dart';
@@ -6,64 +9,76 @@ import 'package:nyoom/pages/travel_routes/travel_routes.dart';
 import 'package:nyoom/pages/settings/settings.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ScreenUtilInit(
+      designSize: Size(1284, 2778), // bry's iPhone 13 Pro Max size
+      minTextAdapt: true,
+      builder: (context, child) {
+        return ProviderScope(child: const MyApp());
+      },
+    ),
+  );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
       title: 'Nyoom',
       theme: ThemeData(
         brightness: Brightness.light,
-        scaffoldBackgroundColor: AppColors.mainBackgroundLight,
+        fontFamily: 'AlbertSans',
+        scaffoldBackgroundColor: AppColors.mainBackground(ref),
         colorScheme: ColorScheme.light(
-          primary: AppColors.nyoomYellowLight,
+          primary: AppColors.nyoomYellow(ref),
           onPrimary: AppColors.white,
           secondary: AppColors.nyoomBlue,
           onSecondary: AppColors.white,
           tertiary: AppColors.nyoomGreen,
           onTertiary: AppColors.white,
-          surface: AppColors.buttonPanelLight,
-          onSurface: AppColors.hintGrayLight,
+          surface: AppColors.buttonPanel(ref),
+          onSurface: AppColors.hintGray(ref),
           error: AppColors.errorRed,
           onError: AppColors.white,
-          outline: AppColors.darkGrayLight,
+          outline: AppColors.darkGray(ref),
         ),
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
-        scaffoldBackgroundColor: AppColors.mainBackgroundDark,
+        fontFamily: 'AlbertSans',
+        scaffoldBackgroundColor: AppColors.mainBackground(ref),
         colorScheme: ColorScheme.dark(
-          primary: AppColors.mainBackgroundDark,
-          onPrimary: AppColors.nyoomYellowDark,
-          secondary: AppColors.mainBackgroundDark,
+          primary: AppColors.mainBackground(ref),
+          onPrimary: AppColors.nyoomYellow(ref),
+          secondary: AppColors.mainBackground(ref),
           onSecondary: AppColors.nyoomBlue,
-          tertiary: AppColors.mainBackgroundDark,
+          tertiary: AppColors.mainBackground(ref),
           onTertiary: AppColors.nyoomGreen,
-          surface: AppColors.buttonPanelDark,
-          onSurface: AppColors.hintGrayDark,
+          surface: AppColors.buttonPanel(ref),
+          onSurface: AppColors.hintGray(ref),
           error: AppColors.errorRed,
           onError: AppColors.white,
-          outline: AppColors.darkGrayDark,
+          outline: AppColors.darkGray(ref),
         ),
       ),
-      themeMode: ThemeMode.dark,
+      themeMode: ref.watch(isDarkModeProvider)
+          ? ThemeMode.dark
+          : ThemeMode.light,
       home: const Main(),
     );
   }
 }
 
-class Main extends StatefulWidget {
+class Main extends ConsumerStatefulWidget {
   const Main({super.key});
 
   @override
-  State<Main> createState() => _MainPageState();
+  ConsumerState<Main> createState() => _MainPageState();
 }
 
-class _MainPageState extends State<Main> {
+class _MainPageState extends ConsumerState<Main> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = const [
@@ -72,11 +87,18 @@ class _MainPageState extends State<Main> {
     TravelRoutes(),
     Settings(),
   ];
-    final List<Color> _pageColors = const [
-    AppColors.nyoomYellowLight,
+
+  List<Color> get _pageColors => [
+    AppColors.nyoomYellow(ref),
     AppColors.nyoomBlue,
     AppColors.nyoomGreen,
-    AppColors.darkGrayLight,
+    AppColors.darkGray(ref),
+  ];
+  final List<IconData> _pageIcons = const [
+    Icons.bookmark,
+    Icons.directions_bus,
+    Icons.location_pin,
+    Icons.settings,
   ];
 
   void _onTabTapped(int index) {
@@ -87,11 +109,36 @@ class _MainPageState extends State<Main> {
 
   @override
   Widget build(BuildContext context) {
+    final page = _pages[_currentIndex];
+    final color = _pageColors[_currentIndex];
+    final icon = _pageIcons[_currentIndex];
+    AppBar? appBar;
+    if (page is HasPageTitle) {
+      final pageData = page as HasPageTitle;
+      appBar = AppBar(
+        backgroundColor: Colors.transparent,
+        title: Row(
+          children: [
+            Icon(icon, color: AppColors.white),
+            const SizedBox(width: 8),
+            Text(
+              pageData.pageTitle ?? "",
+              style: TextStyle(
+                color: AppColors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
     return Scaffold(
-      body: _pages[_currentIndex],
+      appBar: appBar,
+      body: page,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        selectedItemColor: _pageColors[_currentIndex],
+        backgroundColor: AppColors.navBarPanel(ref),
+        selectedItemColor: color,
         onTap: _onTabTapped,
         type: BottomNavigationBarType.fixed,
         items: const [
@@ -105,7 +152,7 @@ class _MainPageState extends State<Main> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.location_pin),
-            label: 'Travel Routes'
+            label: 'Travel Routes',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
@@ -115,4 +162,8 @@ class _MainPageState extends State<Main> {
       ),
     );
   }
+}
+
+abstract class HasPageTitle {
+  String? get pageTitle;
 }
