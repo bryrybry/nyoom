@@ -66,6 +66,7 @@ class MyApp extends ConsumerWidget {
       themeMode: ref.watch(isDarkModeProvider)
           ? ThemeMode.dark
           : ThemeMode.light,
+      debugShowCheckedModeBanner: false,
       home: const Main(),
     );
   }
@@ -92,7 +93,7 @@ class _MainPageState extends ConsumerState<Main> {
     AppColors.nyoomYellow(ref),
     AppColors.nyoomBlue,
     AppColors.nyoomGreen,
-    AppColors.darkGray(ref),
+    AppColors.hintGray(ref),
   ];
   final List<IconData> _pageIcons = const [
     Icons.bookmark,
@@ -135,12 +136,22 @@ class _MainPageState extends ConsumerState<Main> {
     return Scaffold(
       appBar: appBar,
       body: page,
+      backgroundColor: ref.watch(isDarkModeProvider) ? AppColors.mainBackground(ref) : color,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         backgroundColor: AppColors.navBarPanel(ref),
         selectedItemColor: color,
+        iconSize: 90.h,
         onTap: _onTabTapped,
         type: BottomNavigationBarType.fixed,
+        selectedLabelStyle: TextStyle(
+          fontSize: 45.sp,
+          fontWeight: FontWeight.w700,
+        ),
+        unselectedLabelStyle: TextStyle(
+          fontSize: 40.sp,
+          fontWeight: FontWeight.w600,
+        ),
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.bookmark),
