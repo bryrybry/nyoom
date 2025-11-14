@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nyoom/app_state.dart';
-import 'package:nyoom/themes/colors.dart';
+import 'package:nyoom/classes/colors.dart';
 import 'package:nyoom/pages/bookmarks/bookmarks.dart';
 import 'package:nyoom/pages/bus_times/bus_times.dart';
 import 'package:nyoom/pages/travel_routes/travel_routes.dart';

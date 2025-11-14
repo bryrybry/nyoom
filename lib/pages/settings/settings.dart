@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nyoom/app_state.dart';
+import 'package:nyoom/classes/helper.dart';
 import 'package:nyoom/main.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:nyoom/themes/colors.dart';
+import 'package:nyoom/classes/colors.dart';
 
 class Settings extends ConsumerStatefulWidget implements HasPageTitle {
   const Settings({super.key});
@@ -31,7 +32,10 @@ class _BookmarksState extends ConsumerState<Settings> {
               text: "Alerts",
               icon: Icons.notifications,
               ref: ref,
-              onPressed: () {},
+              onPressed: () async {
+                final data = await Helper.loadBusServices();
+                print(data);
+              },
             ),
             CircleButton(
               color: AppColors.nyoomGreen,

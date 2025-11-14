@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:nyoom/themes/colors.dart';
+import 'package:nyoom/classes/colors.dart';
 
 class BusTimes extends ConsumerStatefulWidget {
   const BusTimes({super.key});
@@ -180,3 +180,4 @@ class _BookmarksState extends ConsumerState<BusTimes> {
     );
   }
 }
+ 

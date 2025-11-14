@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nyoom/main.dart';
-import 'package:nyoom/themes/colors.dart';
+import 'package:nyoom/classes/colors.dart';
 
 class TravelRoutes extends ConsumerStatefulWidget implements HasPageTitle {
   const TravelRoutes({super.key});
