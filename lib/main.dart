@@ -14,14 +14,14 @@ void main() {
       designSize: Size(1284, 2778), // bry's iPhone 13 Pro Max size
       minTextAdapt: true,
       builder: (context, child) {
-        return ProviderScope(child: const MyApp());
+        return ProviderScope(child: const Nyoom());
       },
     ),
   );
 }
 
-class MyApp extends ConsumerWidget {
-  const MyApp({super.key});
+class Nyoom extends ConsumerWidget {
+  const Nyoom({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -80,7 +80,16 @@ class Main extends ConsumerStatefulWidget {
 }
 
 class _MainPageState extends ConsumerState<Main> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      ref.read(navigationProvider.notifier).setCallback(onNavigate);
+    });
+  }
+
   int _currentIndex = 0;
+  Widget page = Bookmarks();
 
   final List<Widget> _pages = const [
     Bookmarks(),
@@ -102,15 +111,21 @@ class _MainPageState extends ConsumerState<Main> {
     Icons.settings,
   ];
 
-  void _onTabTapped(int index) {
+  void onNavBarTapped(int index) {
     setState(() {
       _currentIndex = index;
+      page = _pages[_currentIndex];
+    });
+  }
+
+  void onNavigate(Widget newPage) {
+    setState(() {
+      page = newPage;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final page = _pages[_currentIndex];
     final color = _pageColors[_currentIndex];
     final icon = _pageIcons[_currentIndex];
     AppBar? appBar;
@@ -135,14 +150,19 @@ class _MainPageState extends ConsumerState<Main> {
     }
     return Scaffold(
       appBar: appBar,
-      body: page,
-      backgroundColor: ref.watch(isDarkModeProvider) ? AppColors.mainBackground(ref) : color,
+      body: Padding(
+        padding: EdgeInsets.only(top: appBar == null ? 90.h : 0),
+        child: page,
+      ),
+      backgroundColor: ref.watch(isDarkModeProvider)
+          ? AppColors.mainBackground(ref)
+          : color,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         backgroundColor: AppColors.navBarPanel(ref),
         selectedItemColor: color,
         iconSize: 90.h,
-        onTap: _onTabTapped,
+        onTap: onNavBarTapped,
         type: BottomNavigationBarType.fixed,
         selectedLabelStyle: TextStyle(
           fontSize: 45.sp,

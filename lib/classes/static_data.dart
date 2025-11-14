@@ -11,4 +11,9 @@ class StaticData {
     final data = await Helper.readJSON('bus_stops_complete.json');
     return (data as List).map((item) => BusStop.fromJson(item)).toList();
   }
+
+  static Future<Map<String, List<String>>> busServicesAtStop() async {
+    final data = await Helper.readJSON('bus_services_at_stop.json');
+    return (data as Map<String, dynamic>).map((key, value) => MapEntry(key, List<String>.from(value)));
+  }
 }

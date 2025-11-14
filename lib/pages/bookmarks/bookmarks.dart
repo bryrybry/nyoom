@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:nyoom/classes/static_data.dart';
 import 'package:nyoom/main.dart';
 import 'package:nyoom/classes/colors.dart';
 
@@ -59,6 +60,10 @@ class SadBookmark extends StatelessWidget {
                 height: 1.2,
               ),
             ),
+            FloatingActionButton(onPressed: () async {
+              final data = await StaticData.busServicesAtStop();
+              print(data);
+            }, child: Text("a nice test button"),)
           ],
         ),
       ),

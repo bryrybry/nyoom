@@ -38,7 +38,7 @@ class BTSearchResult {
     return BTSearchResult(
       type: "busStop",
       value: stop.busStopCode,
-      header: stop.description,
+      header: stop.busStopName,
       subheader1: stop.busStopCode,
       subheader2: stop.roadName,
     );

@@ -6,6 +6,7 @@ import 'package:nyoom/classes/colors.dart';
 import 'package:nyoom/classes/data_models/bus_stop.dart';
 import 'package:nyoom/classes/data_models/bus_times_search_result.dart';
 import 'package:nyoom/classes/static_data.dart';
+import 'package:nyoom/pages/bus_times/bt_list.dart';
 
 class BusTimes extends ConsumerStatefulWidget {
   const BusTimes({super.key});
@@ -21,6 +22,7 @@ class _BookmarksState extends ConsumerState<BusTimes> {
   List<String> busServices = [];
   List<BusStop> busStops = [];
   List<BTSearchResult> searchResults = [];
+  String searchValue = "";
 
   @override
   void initState() {
@@ -34,6 +36,7 @@ class _BookmarksState extends ConsumerState<BusTimes> {
   }
 
   void onSearchChanged(String value) {
+    searchValue = value;
     setState(() {
       searchResults.clear();
       if (value.isNotEmpty) {
@@ -51,7 +54,7 @@ class _BookmarksState extends ConsumerState<BusTimes> {
             if (stop.busStopCode.toLowerCase().trim().contains(
                   value.toLowerCase().trim(),
                 ) ||
-                stop.description.toLowerCase().trim().contains(
+                stop.busStopName.toLowerCase().trim().contains(
                   value.toLowerCase().trim(),
                 )) {
               searchResults.add(BTSearchResult.fromBusStop(stop));
@@ -68,7 +71,6 @@ class _BookmarksState extends ConsumerState<BusTimes> {
       child: Column(
         spacing: 45.h,
         children: [
-          SizedBox(height: 90.h),
           // View Map Button
           SizedBox(
             width: 1120.w,
@@ -106,7 +108,7 @@ class _BookmarksState extends ConsumerState<BusTimes> {
             height: 180.h,
             child: TextField(
               style: TextStyle(
-                fontSize: 48.sp,
+                fontSize: 56.sp,
                 fontWeight: FontWeight.w400,
                 color: AppColors.primary(ref),
               ),
@@ -150,6 +152,7 @@ class _BookmarksState extends ConsumerState<BusTimes> {
                             ? FilterState.normal
                             : FilterState.services;
                       });
+                      onSearchChanged(searchValue);
                     },
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
@@ -194,6 +197,7 @@ class _BookmarksState extends ConsumerState<BusTimes> {
                             ? FilterState.normal
                             : FilterState.stops;
                       });
+                      onSearchChanged(searchValue);
                     },
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
@@ -227,13 +231,16 @@ class _BookmarksState extends ConsumerState<BusTimes> {
               ),
             ],
           ),
+          // Search Results
           Expanded(
             child: ListView(
               padding: EdgeInsets.zero,
               children: searchResults.map((searchResult) {
                 return BTSearchResultPanel(
                   searchResult: searchResult,
-                  onPressed: () {},
+                  onPressed: () {
+                    ref.read(navigationProvider)?.call(BTList(searchResult: searchResult));
+                  },
                   ref: ref,
                 );
               }).toList(),
@@ -285,7 +292,7 @@ class BTSearchResultPanel extends StatelessWidget {
                     width: 140.w,
                     child: Center(
                       child: Icon(
-                        Icons.location_on,
+                        searchResult.type == "busStop" ? Icons.location_on : Icons.directions_bus,
                         size: 120.sp,
                         color: AppColors.hintGray(ref),
                       ),
@@ -300,8 +307,10 @@ class BTSearchResultPanel extends StatelessWidget {
                         searchResult.header,
                         style: TextStyle(
                           fontSize: 72.sp,
-                          color: ref.watch(isDarkModeProvider) ? AppColors.nyoomYellow(ref) : AppColors.nyoomDarkYellow,
-                          fontWeight: FontWeight.w600,
+                          color: isDarkMode
+                              ? AppColors.nyoomYellow(ref)
+                              : AppColors.nyoomDarkYellow,
+                          fontWeight: FontWeight.w500,
                           height: 1.0,
                         ),
                       ),
@@ -313,7 +322,7 @@ class BTSearchResultPanel extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 48.sp,
                               color: AppColors.nyoomBlue,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w800,
                               height: 1.0,
                             ),
                           ),
@@ -323,7 +332,7 @@ class BTSearchResultPanel extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 48.sp,
                               color: AppColors.nyoomGreen,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w700,
                               height: 1.0,
                             ),
                           ),
