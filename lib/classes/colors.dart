@@ -35,6 +35,12 @@ class AppColors {
         ? const Color(0xFFF2B938)
         : const Color(0xFFCF9C29);
   }
+  
+  static Color nyoomYellowInverted(WidgetRef ref) {
+    return ref.watch(isDarkModeProvider)
+        ? const Color(0xFFCF9C29)
+        : const Color(0xFFF2B938);
+  }
 
   static Color hintGray(WidgetRef ref) {
     return ref.watch(isDarkModeProvider)

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nyoom/app_state.dart';
 import 'package:nyoom/classes/helper.dart';
+import 'package:nyoom/classes/static_data.dart';
 import 'package:nyoom/main.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nyoom/classes/colors.dart';
@@ -33,7 +34,7 @@ class _BookmarksState extends ConsumerState<Settings> {
               icon: Icons.notifications,
               ref: ref,
               onPressed: () async {
-                final data = await Helper.loadBusServices();
+                final data = await StaticData.busStops();
                 print(data);
               },
             ),

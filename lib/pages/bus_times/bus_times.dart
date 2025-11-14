@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:nyoom/app_state.dart';
 import 'package:nyoom/classes/colors.dart';
+import 'package:nyoom/classes/data_models/bus_stop.dart';
+import 'package:nyoom/classes/data_models/bus_times_search_result.dart';
+import 'package:nyoom/classes/static_data.dart';
 
 class BusTimes extends ConsumerStatefulWidget {
   const BusTimes({super.key});
@@ -14,6 +18,49 @@ enum FilterState { services, stops, normal }
 
 class _BookmarksState extends ConsumerState<BusTimes> {
   FilterState filterState = FilterState.normal;
+  List<String> busServices = [];
+  List<BusStop> busStops = [];
+  List<BTSearchResult> searchResults = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadData();
+  }
+
+  Future<void> loadData() async {
+    busServices = await StaticData.busServices();
+    busStops = await StaticData.busStops();
+  }
+
+  void onSearchChanged(String value) {
+    setState(() {
+      searchResults.clear();
+      if (value.isNotEmpty) {
+        if (filterState != FilterState.stops) {
+          for (var service in busServices) {
+            if (service.toLowerCase().trim().contains(
+              value.toLowerCase().trim(),
+            )) {
+              searchResults.add(BTSearchResult.fromBusService(service));
+            }
+          }
+        }
+        if (filterState != FilterState.services) {
+          for (var stop in busStops) {
+            if (stop.busStopCode.toLowerCase().trim().contains(
+                  value.toLowerCase().trim(),
+                ) ||
+                stop.description.toLowerCase().trim().contains(
+                  value.toLowerCase().trim(),
+                )) {
+              searchResults.add(BTSearchResult.fromBusStop(stop));
+            }
+          }
+        }
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,25 +110,25 @@ class _BookmarksState extends ConsumerState<BusTimes> {
                 fontWeight: FontWeight.w400,
                 color: AppColors.primary(ref),
               ),
-              onChanged: (value) {},
+              onChanged: onSearchChanged,
               decoration: InputDecoration(
                 filled: true,
                 fillColor: AppColors.backgroundPanel(ref),
                 hintText: switch (filterState) {
-                        FilterState.normal => "Find...",
-                        FilterState.services => "Find Bus Services...",
-                        FilterState.stops => "Find Bus Stops...",
-                      },
+                  FilterState.normal => "Find...",
+                  FilterState.services => "Find Bus Services...",
+                  FilterState.stops => "Find Bus Stops...",
+                },
                 hintStyle: TextStyle(fontSize: 56.sp),
                 // hintText: '900, 901A, Dover Stn Exit A...',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(60.r),
                 ),
                 prefixIcon: Icon(switch (filterState) {
-                        FilterState.normal => Icons.search,
-                        FilterState.services => Icons.directions_bus,
-                        FilterState.stops => Icons.location_on,
-                      },),
+                  FilterState.normal => Icons.search,
+                  FilterState.services => Icons.directions_bus,
+                  FilterState.stops => Icons.location_on,
+                }),
               ),
             ),
           ),
@@ -125,7 +172,9 @@ class _BookmarksState extends ConsumerState<BusTimes> {
                         style: TextStyle(
                           fontSize: 52.sp,
                           color: AppColors.primary(ref),
-                          fontWeight: (filterState == FilterState.services) ? FontWeight.w700 : FontWeight.w500,
+                          fontWeight: (filterState == FilterState.services)
+                              ? FontWeight.w700
+                              : FontWeight.w500,
                         ),
                       ),
                     ),
@@ -144,7 +193,8 @@ class _BookmarksState extends ConsumerState<BusTimes> {
                         filterState = (filterState == FilterState.stops)
                             ? FilterState.normal
                             : FilterState.stops;
-                      });},
+                      });
+                    },
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(80.r),
@@ -166,7 +216,9 @@ class _BookmarksState extends ConsumerState<BusTimes> {
                         style: TextStyle(
                           fontSize: 52.sp,
                           color: AppColors.primary(ref),
-                          fontWeight: (filterState == FilterState.stops) ? FontWeight.w700 : FontWeight.w500,
+                          fontWeight: (filterState == FilterState.stops)
+                              ? FontWeight.w700
+                              : FontWeight.w500,
                         ),
                       ),
                     ),
@@ -175,9 +227,118 @@ class _BookmarksState extends ConsumerState<BusTimes> {
               ),
             ],
           ),
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: searchResults.map((searchResult) {
+                return BTSearchResultPanel(
+                  searchResult: searchResult,
+                  onPressed: () {},
+                  ref: ref,
+                );
+              }).toList(),
+            ),
+          ),
         ],
       ),
     );
   }
 }
- 
+
+class BTSearchResultPanel extends StatelessWidget {
+  final BTSearchResult searchResult;
+  final VoidCallback? onPressed;
+  final WidgetRef ref;
+
+  const BTSearchResultPanel({
+    super.key,
+    required this.searchResult,
+    required this.onPressed,
+    required this.ref,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDarkMode = ref.watch(isDarkModeProvider);
+    return Column(
+      children: [
+        Center(
+          child: SizedBox(
+            width: 1120.w,
+            height: 200.h,
+            child: ElevatedButton(
+              onPressed: onPressed,
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(150.r),
+                ),
+                backgroundColor: AppColors.buttonPanel(ref),
+                elevation: 3,
+                padding: EdgeInsets.zero,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(width: 20.w),
+                  SizedBox(
+                    height: 140.w,
+                    width: 140.w,
+                    child: Center(
+                      child: Icon(
+                        Icons.location_on,
+                        size: 120.sp,
+                        color: AppColors.hintGray(ref),
+                      ),
+                    ),
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 0,
+                    children: [
+                      Text(
+                        searchResult.header,
+                        style: TextStyle(
+                          fontSize: 72.sp,
+                          color: ref.watch(isDarkModeProvider) ? AppColors.nyoomYellow(ref) : AppColors.nyoomDarkYellow,
+                          fontWeight: FontWeight.w600,
+                          height: 1.0,
+                        ),
+                      ),
+                      SizedBox(height: 8.h),
+                      Row(
+                        children: [
+                          Text(
+                            searchResult.subheader1,
+                            style: TextStyle(
+                              fontSize: 48.sp,
+                              color: AppColors.nyoomBlue,
+                              fontWeight: FontWeight.w600,
+                              height: 1.0,
+                            ),
+                          ),
+                          SizedBox(width: 40.w),
+                          Text(
+                            searchResult.subheader2,
+                            style: TextStyle(
+                              fontSize: 48.sp,
+                              color: AppColors.nyoomGreen,
+                              fontWeight: FontWeight.w600,
+                              height: 1.0,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  SizedBox(width: 20.w),
+                ],
+              ),
+            ),
+          ),
+        ),
+        SizedBox(height: 25.h),
+      ],
+    );
+  }
+}
