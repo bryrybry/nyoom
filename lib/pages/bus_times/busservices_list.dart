@@ -29,9 +29,9 @@ class _BusServicesListState extends ConsumerState<BusServicesList> {
   void generateList() {
     StaticData.busServicesAtStop().then((data) {
       List<BusServiceAT> tempServices = [];
-      for (var entry in data.entries) {
-        if (entry.key == busStop.busStopCode) {
-          for (String service in entry.value) {
+      for (var stop in data.entries) {
+        if (stop.key == busStop.busStopCode) {
+          for (String service in stop.value) {
             tempServices.add(
               BusServiceAT(busService: service, arrivalTimes: [" ", " ", " "]),
             );
@@ -42,8 +42,6 @@ class _BusServicesListState extends ConsumerState<BusServicesList> {
       setState(() {
         services.clear();
         services.addAll(tempServices);
-        print("test4");
-        print(services);
       });
     });
   }
@@ -52,13 +50,12 @@ class _BusServicesListState extends ConsumerState<BusServicesList> {
   Widget build(BuildContext context) {
     return GridView.builder(
       padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 40.h),
-      shrinkWrap: true, 
-      physics: const NeverScrollableScrollPhysics(), // optional
+      shrinkWrap: true,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         mainAxisSpacing: 20.h,
         crossAxisSpacing: 20.w,
-        childAspectRatio: 3,
+        childAspectRatio: 1,
       ),
       itemCount: services.length,
       itemBuilder: (context, index) {
@@ -87,28 +84,38 @@ class _BusServicePanelState extends ConsumerState<BusServicePanel> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 140.h,
-      child: ElevatedButton(
-        onPressed: () {},
-        style: ElevatedButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(80.r),
-          ),
-          backgroundColor: AppColors.buttonPanel(ref),
-          elevation: 3,
-          padding: EdgeInsets.zero,
+    return ElevatedButton(
+      onPressed: () {},
+      style: ElevatedButton.styleFrom(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(80.r),
         ),
-        child: Center(
-          child: Text(
-            widget.busServiceAT.busService, // show the actual service
-            style: TextStyle(
-              fontSize: 52.sp,
-              color: AppColors.primary(ref),
-              fontWeight: FontWeight.w700,
+        backgroundColor: AppColors.buttonPanel(ref),
+        elevation: 3,
+        padding: EdgeInsets.zero,
+      ),
+      child: Center(
+        child: Column(
+          children: [
+            Text(
+              "Bus",
+              style: TextStyle(
+                fontSize: 52.sp,
+                color: AppColors.primary(ref),
+                fontWeight: FontWeight.w400,
+                height: 1.6,
+              ),
             ),
-          ),
+            Text(
+              busServiceAT.busService,
+              style: TextStyle(
+                fontSize: 192.sp,
+                color: AppColors.primary(ref),
+                fontWeight: FontWeight.w700,
+                height: 1.0,
+              ),
+            ),
+          ],
         ),
       ),
     );

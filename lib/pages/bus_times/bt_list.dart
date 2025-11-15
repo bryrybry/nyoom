@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nyoom/app_state.dart';
 import 'package:nyoom/classes/colors.dart';
+import 'package:nyoom/classes/data_models/bus_service.dart';
 import 'package:nyoom/classes/data_models/bus_stop.dart';
 import 'package:nyoom/classes/data_models/bus_times_search_result.dart';
 import 'package:nyoom/pages/bus_times/bus_times.dart';
@@ -47,7 +48,7 @@ class _BTListState extends ConsumerState<BTList> {
                   ),
                 ),
                 Text(
-                  "Location abcbacbaucasc",
+                  searchResult.header,
                   style: TextStyle(
                     color: AppColors.white,
                     fontSize: 72.sp,
@@ -57,25 +58,15 @@ class _BTListState extends ConsumerState<BTList> {
               ],
             ),
           ),
-          searchResult.type == "busService"
-              ? BusStopsList(
-                  busStop: BusStop.fromSearchResult(searchResult) // TODO: Change to bus service
-                )
-              : BusServicesList(
-                  busStop: BusStop.fromSearchResult(searchResult)
-                ),
-          // GridView.builder(
-          //   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          //     crossAxisCount: 2,
-          //     mainAxisSpacing: 8,
-          //     crossAxisSpacing: 8,
-          //     childAspectRatio: 1,
-          //   ),
-          //   itemCount: myItems.length,
-          //   itemBuilder: (context, index) {
-          //     return MyGridItem(item: myItems[index]);
-          //   },
-          // ),
+          Expanded(
+            child: searchResult.type == "busService"
+                ? BusStopsList(
+                    busService: BusService.fromSearchResult(searchResult),
+                  )
+                : BusServicesList(
+                    busStop: BusStop.fromSearchResult(searchResult),
+                  ),
+          ),
         ],
       ),
     );
