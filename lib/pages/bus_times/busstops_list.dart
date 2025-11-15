@@ -65,7 +65,7 @@ class _BusStopsListState extends ConsumerState<BusStopsList> {
   Widget build(BuildContext context) {
     List<BusStopAT> selectedStops = isOtherDirection ? stops2 : stops;
     return GridView.builder(
-      padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 40.h),
+      padding: EdgeInsets.symmetric(horizontal: 40.w),
       shrinkWrap: true,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 1,

@@ -24,20 +24,13 @@ class BusStop {
       longitude: (json["Longitude"] as num).toDouble(),
     );
   }
+
   factory BusStop.fromSearchResult(BTSearchResult searchResult) {
     return BusStop(
       busStopCode: searchResult.value,
       roadName: searchResult.subheader2,
       busStopName: searchResult.header,
     );
-  }
-  factory BusStop.fromBusStopCode(String busStopCode, List<BusStop> busStops) {
-    for (BusStop busStop in busStops) {
-      if (busStop.busStopCode == busStopCode) {
-        return busStop;
-      }
-    }
-    throw Error();
   }
 }
 
@@ -52,10 +45,6 @@ class BusStopAT extends BusStop {
     super.longitude,
     required this.arrivalTimes,
   });
-
-  List<String> getArrivalTimes() {
-    return arrivalTimes;
-  }
 
   factory BusStopAT.fromBusStopCode(
     String busStopCode,
@@ -72,7 +61,6 @@ class BusStopAT extends BusStop {
         );
       }
     }
-    print('busStopCode: $busStopCode');
     throw Error();
   }
 }

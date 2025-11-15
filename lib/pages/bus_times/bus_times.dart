@@ -298,49 +298,52 @@ class BTSearchResultPanel extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    spacing: 0,
-                    children: [
-                      Text(
-                        searchResult.header,
-                        style: TextStyle(
-                          fontSize: 72.sp,
-                          color: isDarkMode
-                              ? AppColors.nyoomYellow(ref)
-                              : AppColors.nyoomDarkYellow,
-                          fontWeight: FontWeight.w500,
-                          height: 1.0,
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 0,
+                      children: [
+                        Text(
+                          searchResult.header,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 72.sp,
+                            color: isDarkMode
+                                ? AppColors.nyoomYellow(ref)
+                                : AppColors.nyoomDarkYellow,
+                            fontWeight: FontWeight.w500,
+                            height: 1.0,
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 8.h),
-                      Row(
-                        children: [
-                          Text(
-                            searchResult.subheader1,
-                            style: TextStyle(
-                              fontSize: 48.sp,
-                              color: AppColors.nyoomBlue,
-                              fontWeight: FontWeight.w800,
-                              height: 1.0,
+                        SizedBox(height: 8.h),
+                        Row(
+                          children: [
+                            Text(
+                              searchResult.subheader1,
+                              style: TextStyle(
+                                fontSize: 48.sp,
+                                color: AppColors.nyoomBlue,
+                                fontWeight: FontWeight.w800,
+                                height: 1.0,
+                              ),
                             ),
-                          ),
-                          SizedBox(width: 40.w),
-                          Text(
-                            searchResult.subheader2,
-                            style: TextStyle(
-                              fontSize: 48.sp,
-                              color: AppColors.nyoomGreen,
-                              fontWeight: FontWeight.w700,
-                              height: 1.0,
+                            SizedBox(width: 40.w),
+                            Text(
+                              searchResult.subheader2,
+                              style: TextStyle(
+                                fontSize: 48.sp,
+                                color: AppColors.nyoomGreen,
+                                fontWeight: FontWeight.w700,
+                                height: 1.0,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                  SizedBox(width: 20.w),
+                  SizedBox(width: 40.w),
                 ],
               ),
             ),

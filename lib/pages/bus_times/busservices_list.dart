@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:nyoom/app_state.dart';
 import 'package:nyoom/classes/colors.dart';
 import 'package:nyoom/classes/data_models/bus_service.dart';
 import 'package:nyoom/classes/data_models/bus_stop.dart';
@@ -49,7 +50,7 @@ class _BusServicesListState extends ConsumerState<BusServicesList> {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 40.h),
+      padding: EdgeInsets.symmetric(horizontal: 40.w),
       shrinkWrap: true,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
@@ -101,17 +102,36 @@ class _BusServicePanelState extends ConsumerState<BusServicePanel> {
               "Bus",
               style: TextStyle(
                 fontSize: 52.sp,
-                color: AppColors.primary(ref),
+                color: AppColors.hintGray(ref),
                 fontWeight: FontWeight.w400,
-                height: 1.6,
+                height: 1.8,
               ),
             ),
             Text(
               busServiceAT.busService,
               style: TextStyle(
                 fontSize: 192.sp,
-                color: AppColors.primary(ref),
-                fontWeight: FontWeight.w700,
+                color: ref.watch(isDarkModeProvider)
+                    ? AppColors.nyoomYellow(ref)
+                    : AppColors.primary(ref),
+                fontWeight: FontWeight.w800,
+                height: 1.0,
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 40.w),
+              child: SizedBox(
+                height: 5.h,
+                width: double.infinity,
+                child: Container(color: AppColors.darkGray(ref)),
+              ),
+            ),
+            Text(
+              "Arriving in:",
+              style: TextStyle(
+                fontSize: 42.sp,
+                color: AppColors.hintGray(ref),
+                fontWeight: FontWeight.w600,
                 height: 1.0,
               ),
             ),

@@ -58,6 +58,7 @@ class _BTListState extends ConsumerState<BTList> {
               ],
             ),
           ),
+          SizedBox(height: 40.h),
           Expanded(
             child: searchResult.type == "busService"
                 ? BusStopsList(
