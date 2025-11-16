@@ -29,6 +29,7 @@ class _BusStopsListState extends ConsumerState<BusStopsList> {
     busService = widget.busService;
     generateList();
   }
+  // TODO: STORE DIRECTION
 
   void generateList() {
     StaticData.busStopsMap().then((data) async {
