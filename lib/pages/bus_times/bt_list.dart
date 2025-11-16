@@ -73,35 +73,3 @@ class _BTListState extends ConsumerState<BTList> {
     );
   }
 }
-
-class BusServicePanel extends StatelessWidget {
-  final BTSearchResult searchResult;
-  final WidgetRef ref;
-
-  const BusServicePanel({
-    super.key,
-    required this.searchResult,
-    required this.ref,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Text("Service Results");
-  }
-}
-
-class BusStopPanel extends StatelessWidget {
-  final BTSearchResult searchResult;
-  final WidgetRef ref;
-
-  const BusStopPanel({
-    super.key,
-    required this.searchResult,
-    required this.ref,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Text("Stop Results");
-  }
-}
