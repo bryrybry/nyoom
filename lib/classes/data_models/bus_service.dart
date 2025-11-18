@@ -14,14 +14,14 @@ class BusService {
 }
 
 class BusServiceAT extends BusService {
-  final List<String> arrivalTimes;
+  final List<int> arrivalTimes;
 
   BusServiceAT({
     required super.busService,
     required this.arrivalTimes,
   });
 
-  List<String> getArrivalTimes() {
+  List<int> getArrivalTimes() {
     return arrivalTimes;
   }
 }

@@ -13,6 +13,9 @@ dependencies:
   flutter_riverpod: ^3.0.3
   flutter_screenutil: ^5.9.3
   auto_size_text: ^3.0.0
+  dio: ^5.9.0
+  flutter_dotenv: ^6.0.0
+  ntp: ^2.0.0
 
 dev_dependencies:
   flutter_test:
@@ -24,6 +27,7 @@ flutter:
   assets:
   - assets/images/
   - assets/data/
+  - assets/.env
   fonts:
     - family: AlbertSans
       fonts:

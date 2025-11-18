@@ -6,6 +6,7 @@ import 'package:nyoom/classes/colors.dart';
 import 'package:nyoom/classes/data_models/bus_service.dart';
 import 'package:nyoom/classes/data_models/bus_stop.dart';
 import 'package:nyoom/classes/static_data.dart';
+import 'package:nyoom/pages/bus_times/arrival_time_display.dart';
 
 class BusServicesList extends ConsumerStatefulWidget {
   final BusStop busStop;
@@ -34,7 +35,7 @@ class _BusServicesListState extends ConsumerState<BusServicesList> {
         if (stop.key == busStop.busStopCode) {
           for (String service in stop.value) {
             tempServices.add(
-              BusServiceAT(busService: service, arrivalTimes: [" ", " ", " "]),
+              BusServiceAT(busService: service, arrivalTimes: [-1, -1, -1]),
             );
           }
           break;
@@ -96,46 +97,38 @@ class _BusServicePanelState extends ConsumerState<BusServicePanel> {
         padding: EdgeInsets.zero,
       ),
       child: Center(
-        child: Column(
-          children: [
-            Text(
-              "Bus",
-              style: TextStyle(
-                fontSize: 52.sp,
-                color: AppColors.hintGray(ref),
-                fontWeight: FontWeight.w400,
-                height: 1.8,
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 40.w),
+          child: Column(
+            children: [
+              Text(
+                "Bus",
+                style: TextStyle(
+                  fontSize: 52.sp,
+                  color: AppColors.hintGray(ref),
+                  fontWeight: FontWeight.w400,
+                  height: 1.0,
+                ),
               ),
-            ),
-            Text(
-              busServiceAT.busService,
-              style: TextStyle(
-                fontSize: 192.sp,
-                color: ref.watch(isDarkModeProvider)
-                    ? AppColors.nyoomYellow(ref)
-                    : AppColors.primary(ref),
-                fontWeight: FontWeight.w800,
-                height: 1.0,
+              Text(
+                busServiceAT.busService,
+                style: TextStyle(
+                  fontSize: 192.sp,
+                  color: ref.watch(isDarkModeProvider)
+                      ? AppColors.nyoomYellow(ref)
+                      : AppColors.primary(ref),
+                  fontWeight: FontWeight.w800,
+                  height: 1.0,
+                ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 40.w),
-              child: SizedBox(
+              SizedBox(
                 height: 5.h,
                 width: double.infinity,
                 child: Container(color: AppColors.darkGray(ref)),
               ),
-            ),
-            Text(
-              "Arriving in:",
-              style: TextStyle(
-                fontSize: 42.sp,
-                color: AppColors.hintGray(ref),
-                fontWeight: FontWeight.w600,
-                height: 1.0,
-              ),
-            ),
-          ],
+              ArrivalTimeDisplay(arrivalTimes: busServiceAT.arrivalTimes),
+            ],
+          ),
         ),
       ),
     );

@@ -2,9 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:nyoom/classes/static_data.dart';
 import 'package:nyoom/main.dart';
 import 'package:nyoom/classes/colors.dart';
+import 'package:nyoom/test.dart';
 
 class Bookmarks extends ConsumerStatefulWidget implements HasPageTitle {
   const Bookmarks({super.key});
@@ -61,8 +61,7 @@ class SadBookmark extends StatelessWidget {
               ),
             ),
             FloatingActionButton(onPressed: () async {
-              final data = await StaticData.busServicesAtStop();
-              print(data);
+              testFunction();
             }, child: Text("a nice test button"),)
           ],
         ),

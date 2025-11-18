@@ -7,6 +7,7 @@ import 'package:nyoom/classes/colors.dart';
 import 'package:nyoom/classes/data_models/bus_service.dart';
 import 'package:nyoom/classes/data_models/bus_stop.dart';
 import 'package:nyoom/classes/static_data.dart';
+import 'package:nyoom/pages/bus_times/arrival_time_display.dart';
 
 class BusStopsList extends ConsumerStatefulWidget {
   final BusService busService;
@@ -40,12 +41,12 @@ class _BusStopsListState extends ConsumerState<BusStopsList> {
         if (service.key == busService.busService) {
           for (var stop in service.value["1"] ?? []) {
             tempStops.add(
-              BusStopAT.fromBusStopCode(stop[0], [" ", " ", " "], allBusStops),
+              BusStopAT.fromBusStopCode(stop[0], [-1, -1, -1], allBusStops),
             );
           }
           for (var stop in service.value["2"] ?? []) {
             tempStops2.add(
-              BusStopAT.fromBusStopCode(stop[0], [" ", " ", " "], allBusStops),
+              BusStopAT.fromBusStopCode(stop[0], [-1, -1, -1], allBusStops),
             );
           }
           break;
@@ -89,9 +90,7 @@ class _BusStopsListState extends ConsumerState<BusStopsList> {
                 ),
               ),
             ),
-          )
-        else
-          Container(),
+          ),
         SizedBox(height: 40.h),
         Expanded(
           child: GridView.builder(
@@ -102,7 +101,7 @@ class _BusStopsListState extends ConsumerState<BusStopsList> {
               crossAxisCount: 1,
               mainAxisSpacing: 20.h,
               crossAxisSpacing: 20.w,
-              childAspectRatio: 2.8,
+              childAspectRatio: 3.5,
             ),
             itemCount: selectedStops.length,
             itemBuilder: (context, index) {
@@ -147,87 +146,65 @@ class _BusStopPanelState extends ConsumerState<BusStopPanel> {
         ),
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 20.h),
-          child: Column(
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  busStopAT.busStopName,
-                  style: TextStyle(
-                    fontSize: 96.sp,
-                    color: AppColors.primary(ref),
-                    fontWeight: FontWeight.w700,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ),
-              SizedBox(height: 20.h),
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            busStopAT.roadName,
-                            style: TextStyle(
-                              fontSize: 60.sp,
-                              color: ref.watch(isDarkModeProvider)
-                                  ? AppColors.nyoomYellow(ref)
-                                  : AppColors.nyoomDarkYellow,
-                              fontWeight: FontWeight.w500,
-                              height: 1.0,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          Text(
-                            "(${busStopAT.busStopCode})",
-                            style: TextStyle(
-                              fontSize: 48.sp,
-                              color: AppColors.hintGray(ref),
-                              fontWeight: FontWeight.w500,
-                              height: 2.0,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 40.w),
-                      child: SizedBox(
-                        width: 5.w,
-                        child: Container(color: AppColors.darkGray(ref)),
-                      ),
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Arriving in:",
+          child: Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 120.h,
+                        child: AutoSizeText(
+                          busStopAT.busStopName,
+                          maxLines: 2,
+                          minFontSize: (48.sp).roundToDouble(),
+                          maxFontSize: (84.sp).roundToDouble(),
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontSize: 42.sp,
-                            color: AppColors.hintGray(ref),
-                            fontWeight: FontWeight.w600,
+                            fontSize: 84.sp,
+                            color: AppColors.primary(ref),
+                            fontWeight: FontWeight.w800,
                             height: 1.0,
                           ),
                         ),
-                        Expanded(
-                          child: SizedBox(
-                            width: 400.w,
-                            child: Stack(children: [
-                              
-                            ],),
-                          ),
+                      ),
+                      Text(
+                        busStopAT.roadName,
+                        style: TextStyle(
+                          fontSize: 48.sp,
+                          color: ref.watch(isDarkModeProvider)
+                              ? AppColors.nyoomYellow(ref)
+                              : AppColors.nyoomDarkYellow,
+                          fontWeight: FontWeight.w600,
+                          height: 1.0,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                      Text(
+                        "(${busStopAT.busStopCode})",
+                        style: TextStyle(
+                          fontSize: 48.sp,
+                          color: AppColors.hintGray(ref),
+                          fontWeight: FontWeight.w500,
+                          height: 1.0,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 40.w),
+                  child: SizedBox(
+                    width: 5.w,
+                    child: Container(color: AppColors.darkGray(ref)),
+                  ),
+                ),
+                ArrivalTimeDisplay(arrivalTimes: busStopAT.arrivalTimes),
+              ],
+            ),
           ),
         ),
       ),

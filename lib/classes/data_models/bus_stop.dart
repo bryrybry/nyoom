@@ -35,7 +35,7 @@ class BusStop {
 }
 
 class BusStopAT extends BusStop {
-  final List<String> arrivalTimes;
+  final List<int> arrivalTimes;
 
   BusStopAT({
     required super.busStopCode,
@@ -48,7 +48,7 @@ class BusStopAT extends BusStop {
 
   factory BusStopAT.fromBusStopCode(
     String busStopCode,
-    List<String> arrivalTimes,
+    List<int> arrivalTimes,
     List<BusStop> busStops,
   ) {
     for (BusStop busStop in busStops) {

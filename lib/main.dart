@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,11 +9,14 @@ import 'package:nyoom/pages/bookmarks/bookmarks.dart';
 import 'package:nyoom/pages/bus_times/bus_times.dart';
 import 'package:nyoom/pages/travel_routes/travel_routes.dart';
 import 'package:nyoom/pages/settings/settings.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: "assets/.env");
   runApp(
     ScreenUtilInit(
-      designSize: Size(1284, 2778), // bry's iPhone 13 Pro Max size
+      designSize: const Size(1284, 2778),
       minTextAdapt: true,
       builder: (context, child) {
         return ProviderScope(child: const Nyoom());
@@ -19,6 +24,7 @@ void main() {
     ),
   );
 }
+
 
 class Nyoom extends ConsumerWidget {
   const Nyoom({super.key});
