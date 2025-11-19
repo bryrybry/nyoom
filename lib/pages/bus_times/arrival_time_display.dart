@@ -137,7 +137,25 @@ class _ArrivalTimeDisplayState extends ConsumerState<ArrivalTimeDisplay> {
                         ),
                       ),
                       Text(
-                        "${processAT(at2)} ${processAT(at3)}",
+                        processAT(at2),
+                        style: TextStyle(
+                          fontSize: 96.sp,
+                          color: AppColors.nyoomBlue,
+                          fontWeight: FontWeight.w800,
+                          height: 1.0,
+                        ),
+                      ),
+                      Text(
+                        ", ",
+                        style: TextStyle(
+                          fontSize: 96.sp,
+                          color: AppColors.hintGray(ref),
+                          fontWeight: FontWeight.w800,
+                          height: 1.0,
+                        ),
+                      ),
+                      Text(
+                        processAT(at3),
                         style: TextStyle(
                           fontSize: 96.sp,
                           color: AppColors.nyoomBlue,
