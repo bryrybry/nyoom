@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -13,7 +11,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: "assets/.env");
+  await dotenv.load(fileName: ".env");
   runApp(
     ScreenUtilInit(
       designSize: const Size(1284, 2778),
@@ -24,7 +22,6 @@ Future<void> main() async {
     ),
   );
 }
-
 
 class Nyoom extends ConsumerWidget {
   const Nyoom({super.key});

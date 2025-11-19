@@ -4,10 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nyoom/app_state.dart';
 import 'package:nyoom/classes/colors.dart';
+import 'package:nyoom/classes/data_models/bus_arrival.dart';
 import 'package:nyoom/classes/data_models/bus_service.dart';
 import 'package:nyoom/classes/data_models/bus_stop.dart';
 import 'package:nyoom/classes/static_data.dart';
 import 'package:nyoom/pages/bus_times/arrival_time_display.dart';
+import 'package:nyoom/services/api_service.dart';
 
 class BusStopsList extends ConsumerStatefulWidget {
   final BusService busService;
@@ -31,6 +33,7 @@ class _BusStopsListState extends ConsumerState<BusStopsList> {
     generateList();
   }
   // TODO: STORE DIRECTION
+  // TODO: W/G Buses
 
   void generateList() {
     StaticData.busStopsMap().then((data) async {
@@ -41,12 +44,20 @@ class _BusStopsListState extends ConsumerState<BusStopsList> {
         if (service.key == busService.busService) {
           for (var stop in service.value["1"] ?? []) {
             tempStops.add(
-              BusStopAT.fromBusStopCode(stop[0], [-1, -1, -1], allBusStops),
+              BusStopAT.fromBusStopCode(
+                stop[0],
+                await ApiService.busArrival(stop[0], busService.busService),
+                allBusStops,
+              ),
             );
           }
           for (var stop in service.value["2"] ?? []) {
             tempStops2.add(
-              BusStopAT.fromBusStopCode(stop[0], [-1, -1, -1], allBusStops),
+              BusStopAT.fromBusStopCode(
+                stop[0],
+                await ApiService.busArrival(stop[0], busService.busService),
+                allBusStops,
+              ),
             );
           }
           break;
@@ -101,7 +112,7 @@ class _BusStopsListState extends ConsumerState<BusStopsList> {
               crossAxisCount: 1,
               mainAxisSpacing: 20.h,
               crossAxisSpacing: 20.w,
-              childAspectRatio: 3.5,
+              childAspectRatio: 3.45,
             ),
             itemCount: selectedStops.length,
             itemBuilder: (context, index) {
@@ -202,7 +213,9 @@ class _BusStopPanelState extends ConsumerState<BusStopPanel> {
                     child: Container(color: AppColors.darkGray(ref)),
                   ),
                 ),
-                ArrivalTimeDisplay(arrivalTimes: busStopAT.arrivalTimes),
+                ArrivalTimeDisplay(
+                  busArrivalService: busStopAT.busArrivalService,
+                ),
               ],
             ),
           ),

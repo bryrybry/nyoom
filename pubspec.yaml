@@ -27,7 +27,7 @@ flutter:
   assets:
   - assets/images/
   - assets/data/
-  - assets/.env
+  - .env
   fonts:
     - family: AlbertSans
       fonts:

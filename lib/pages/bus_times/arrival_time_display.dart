@@ -2,55 +2,57 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nyoom/classes/colors.dart';
+import 'package:nyoom/classes/data_models/bus_arrival.dart';
 
 class ArrivalTimeDisplay extends ConsumerStatefulWidget {
-  final List<int> arrivalTimes;
+  final BusArrivalService busArrivalService;
 
-  const ArrivalTimeDisplay({super.key, required this.arrivalTimes});
+  const ArrivalTimeDisplay({super.key, required this.busArrivalService});
 
   @override
   ConsumerState<ArrivalTimeDisplay> createState() => _ArrivalTimeDisplayState();
 }
 
 class _ArrivalTimeDisplayState extends ConsumerState<ArrivalTimeDisplay> {
-  late List<String> arrivalTimes;
+  late int at1;
+  late int at2;
+  late int at3;
+  bool isDoubleDecker = false;
+  bool isEstimatedTime = false;
+  bool isWheelchairAccessible = false;
+  String load = "SEA";
   @override
   void initState() {
     super.initState();
-    onArrivalTimesUpdated(widget.arrivalTimes);
+    onArrivalTimesUpdated(widget.busArrivalService);
   }
 
   @override
   void didUpdateWidget(covariant ArrivalTimeDisplay oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.arrivalTimes != widget.arrivalTimes) {
-      onArrivalTimesUpdated(widget.arrivalTimes);
+    if (oldWidget.busArrivalService != widget.busArrivalService) {
+      onArrivalTimesUpdated(widget.busArrivalService);
     }
   }
 
-  onArrivalTimesUpdated(List<int> arrivalTimesRaw) {
-    List<String> newArrivalTimes = List.filled(arrivalTimesRaw.length, "");
-    for (int i = 0; i < arrivalTimesRaw.length; i++) {
-      switch (arrivalTimesRaw[i]) {
-        case 0:
-          newArrivalTimes[i] = "Now";
-          break;
-        case -1:
-          newArrivalTimes[i] = "";
-          break;
-        default:
-          newArrivalTimes[i] = arrivalTimesRaw[i].toString();
-          break;
-      }
-    }
+  onArrivalTimesUpdated(BusArrivalService busArrivalService) {
     setState(() {
-      arrivalTimes = newArrivalTimes;
+      at1 = busArrivalService.nextBus.arrivalTime;
+      at2 = busArrivalService.nextBus2.arrivalTime;
+      at3 = busArrivalService.nextBus3.arrivalTime;
+      isDoubleDecker = busArrivalService.nextBus.isDoubleDecker;
+      isEstimatedTime = busArrivalService.nextBus.isEstimatedTime;
+      isWheelchairAccessible = busArrivalService.nextBus.isWheelchairAccessible;
+      load = busArrivalService.nextBus.load;
     });
+  }
+
+  String processAT(int at) {
+    return (at == -1) ? " " : at.toString();
   }
 
   @override
   Widget build(BuildContext context) {
-    onArrivalTimesUpdated([10, 20, 55]);
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -73,7 +75,7 @@ class _ArrivalTimeDisplayState extends ConsumerState<ArrivalTimeDisplay> {
                 // First Arrival Time
                 Row(
                   children: [
-                    (arrivalTimes[0] == "Now")
+                    (at1 == 0)
                         ? Text(
                             "N",
                             style: TextStyle(
@@ -84,7 +86,7 @@ class _ArrivalTimeDisplayState extends ConsumerState<ArrivalTimeDisplay> {
                             ),
                           )
                         : Text(
-                            arrivalTimes[0],
+                            processAT(at1),
                             style: TextStyle(
                               fontSize: 160.sp,
                               color: AppColors.nyoomYellow(ref),
@@ -92,7 +94,7 @@ class _ArrivalTimeDisplayState extends ConsumerState<ArrivalTimeDisplay> {
                               height: 1.0,
                             ),
                           ),
-                    (arrivalTimes[0] == "Now")
+                    (at1 == 0)
                         ? Transform.translate(
                             offset: Offset(0, -30.sp),
                             child: Text(
@@ -135,7 +137,7 @@ class _ArrivalTimeDisplayState extends ConsumerState<ArrivalTimeDisplay> {
                         ),
                       ),
                       Text(
-                        "${arrivalTimes[1]} ${arrivalTimes[2]}",
+                        "${processAT(at2)} ${processAT(at3)}",
                         style: TextStyle(
                           fontSize: 96.sp,
                           color: AppColors.nyoomBlue,

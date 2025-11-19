@@ -3,10 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nyoom/app_state.dart';
 import 'package:nyoom/classes/colors.dart';
+import 'package:nyoom/classes/data_models/bus_arrival.dart';
 import 'package:nyoom/classes/data_models/bus_service.dart';
 import 'package:nyoom/classes/data_models/bus_stop.dart';
 import 'package:nyoom/classes/static_data.dart';
 import 'package:nyoom/pages/bus_times/arrival_time_display.dart';
+import 'package:nyoom/services/api_service.dart';
 
 class BusServicesList extends ConsumerStatefulWidget {
   final BusStop busStop;
@@ -29,13 +31,19 @@ class _BusServicesListState extends ConsumerState<BusServicesList> {
   }
 
   void generateList() {
-    StaticData.busServicesAtStop().then((data) {
+    StaticData.busServicesAtStop().then((data) async {
       List<BusServiceAT> tempServices = [];
       for (var stop in data.entries) {
         if (stop.key == busStop.busStopCode) {
           for (String service in stop.value) {
             tempServices.add(
-              BusServiceAT(busService: service, arrivalTimes: [-1, -1, -1]),
+              BusServiceAT(
+                busService: service,
+                busArrivalService: await ApiService.busArrival(
+                  busStop.busStopCode,
+                  service,
+                ),
+              ),
             );
           }
           break;
@@ -104,7 +112,7 @@ class _BusServicePanelState extends ConsumerState<BusServicePanel> {
               Text(
                 "Bus",
                 style: TextStyle(
-                  fontSize: 52.sp,
+                  fontSize: 42.sp,
                   color: AppColors.hintGray(ref),
                   fontWeight: FontWeight.w400,
                   height: 1.0,
@@ -126,7 +134,9 @@ class _BusServicePanelState extends ConsumerState<BusServicePanel> {
                 width: double.infinity,
                 child: Container(color: AppColors.darkGray(ref)),
               ),
-              ArrivalTimeDisplay(arrivalTimes: busServiceAT.arrivalTimes),
+              ArrivalTimeDisplay(
+                busArrivalService: busServiceAT.busArrivalService,
+              ),
             ],
           ),
         ),

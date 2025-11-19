@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nyoom/app_state.dart';
-import 'package:nyoom/classes/helper.dart';
 import 'package:nyoom/classes/static_data.dart';
 import 'package:nyoom/main.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -106,19 +105,23 @@ class CircleButton extends StatelessWidget {
     final isDarkMode = ref.watch(isDarkModeProvider);
     return SizedBox(
       width: 320.w,
-      height: 320.w, 
+      height: 320.w,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           shape: const CircleBorder(),
-          backgroundColor: isDarkMode ? AppColors.buttonPanel(ref) : color, 
-          elevation: 3, 
-          padding: EdgeInsets.zero, 
+          backgroundColor: isDarkMode ? AppColors.buttonPanel(ref) : color,
+          elevation: 3,
+          padding: EdgeInsets.zero,
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 150.sp, color: isDarkMode ? color : AppColors.white),
+            Icon(
+              icon,
+              size: 150.sp,
+              color: isDarkMode ? color : AppColors.white,
+            ),
             Text(
               text,
               style: TextStyle(
@@ -152,16 +155,16 @@ class WideButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: 820.w,
-      height: 180.h, 
+      height: 180.h,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(80.r),
           ),
-          backgroundColor: color, 
-          elevation: 3, 
-          padding: EdgeInsets.zero, 
+          backgroundColor: color,
+          elevation: 3,
+          padding: EdgeInsets.zero,
         ),
         child: Center(
           child: Text(

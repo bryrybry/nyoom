@@ -1,27 +1,21 @@
+import 'package:nyoom/classes/data_models/bus_arrival.dart';
 import 'package:nyoom/classes/data_models/bus_times_search_result.dart';
 
 class BusService {
   final String busService;
 
-  BusService({
-    required this.busService,
-  });
+  BusService({required this.busService});
   factory BusService.fromSearchResult(BTSearchResult searchResult) {
-    return BusService(
-      busService: searchResult.value,
-    );
+    return BusService(busService: searchResult.value);
   }
 }
 
 class BusServiceAT extends BusService {
-  final List<int> arrivalTimes;
+  final BusArrivalService busArrivalService;
 
-  BusServiceAT({
-    required super.busService,
-    required this.arrivalTimes,
-  });
+  BusServiceAT({required super.busService, required this.busArrivalService});
 
-  List<int> getArrivalTimes() {
-    return arrivalTimes;
+  BusArrivalService getArrivalTimes() {
+    return busArrivalService;
   }
 }

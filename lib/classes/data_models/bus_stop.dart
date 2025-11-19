@@ -1,3 +1,4 @@
+import 'package:nyoom/classes/data_models/bus_arrival.dart';
 import 'package:nyoom/classes/data_models/bus_times_search_result.dart';
 
 class BusStop {
@@ -35,7 +36,7 @@ class BusStop {
 }
 
 class BusStopAT extends BusStop {
-  final List<int> arrivalTimes;
+  BusArrivalService busArrivalService;
 
   BusStopAT({
     required super.busStopCode,
@@ -43,12 +44,12 @@ class BusStopAT extends BusStop {
     required super.busStopName,
     super.latitude,
     super.longitude,
-    required this.arrivalTimes,
+    required this.busArrivalService,
   });
 
   factory BusStopAT.fromBusStopCode(
     String busStopCode,
-    List<int> arrivalTimes,
+    BusArrivalService busArrivalService,
     List<BusStop> busStops,
   ) {
     for (BusStop busStop in busStops) {
@@ -57,7 +58,7 @@ class BusStopAT extends BusStop {
           busStopCode: busStop.busStopCode,
           roadName: busStop.roadName,
           busStopName: busStop.busStopName,
-          arrivalTimes: arrivalTimes,
+          busArrivalService: busArrivalService,
         );
       }
     }
