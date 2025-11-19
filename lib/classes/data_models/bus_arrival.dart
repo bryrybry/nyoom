@@ -37,6 +37,15 @@ class BusArrivalService {
     );
   }
 
+    static BusArrivalService initBusArrivalService() {
+    return BusArrivalService(
+      serviceNo: "",
+      nextBus: _BusTiming.initBusTiming(),
+      nextBus2: _BusTiming.initBusTiming(),
+      nextBus3: _BusTiming.initBusTiming(),
+    );
+  }
+
   static Future<BusArrivalService> fromJson(Map<String, dynamic> json) async {
     Future<_BusTiming> parseBusTiming(dynamic data) async {
       if (data == null || data is! Map<String, dynamic>) {
@@ -79,6 +88,16 @@ class _BusTiming {
       load: "SEA",
     );
   }
+  
+  static _BusTiming initBusTiming() {
+    return _BusTiming(
+      arrivalTime: -2,
+      isDoubleDecker: false,
+      isEstimatedTime: false,
+      isWheelchairAccessible: false,
+      load: "SEA",
+    );
+  }
 
   static Future<_BusTiming> fromJson(Map<String, dynamic> json) async {
     return _BusTiming(
@@ -92,7 +111,9 @@ class _BusTiming {
 
   static Future<int> minutesFromNow(String targetISOTimestamp) async {
     DateTime target;
-
+    if (targetISOTimestamp.isEmpty) {
+      return -1;
+    }
     try {
       target = DateTime.parse(
         targetISOTimestamp,

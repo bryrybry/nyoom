@@ -35,7 +35,7 @@ class _BTListState extends ConsumerState<BTList> {
         children: [
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 40.w),
-            child: Row(
+            child: Stack(
               children: [
                 GestureDetector(
                   onTap: () {
@@ -47,12 +47,14 @@ class _BTListState extends ConsumerState<BTList> {
                     color: AppColors.white,
                   ),
                 ),
-                Text(
-                  searchResult.header,
-                  style: TextStyle(
-                    color: AppColors.white,
-                    fontSize: 72.sp,
-                    fontWeight: FontWeight.w400,
+                Center(
+                  child: Text(
+                    "${searchResult.type == "busService" ? "Bus " : ""}${searchResult.header}",
+                    style: TextStyle(
+                      color: AppColors.white,
+                      fontSize: 72.sp,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
                 ),
               ],

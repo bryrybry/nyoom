@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nyoom/app_state.dart';
 import 'package:nyoom/classes/colors.dart';
+import 'package:nyoom/classes/data_models/bus_service.dart';
 import 'package:nyoom/classes/data_models/bus_stop.dart';
 import 'package:nyoom/classes/data_models/bus_times_search_result.dart';
 import 'package:nyoom/classes/static_data.dart';
@@ -45,7 +46,9 @@ class _BookmarksState extends ConsumerState<BusTimes> {
             if (service.toLowerCase().trim().contains(
               value.toLowerCase().trim(),
             )) {
-              searchResults.add(BTSearchResult.fromBusService(service));
+              searchResults.add(
+                BTSearchResult.fromBusService(BusService(busService: service)),
+              );
             }
           }
         }
@@ -239,7 +242,9 @@ class _BookmarksState extends ConsumerState<BusTimes> {
                 return BTSearchResultPanel(
                   searchResult: searchResult,
                   onPressed: () {
-                    ref.read(navigationProvider)?.call(BTList(searchResult: searchResult));
+                    ref
+                        .read(navigationProvider)
+                        ?.call(BTList(searchResult: searchResult));
                   },
                   ref: ref,
                 );
@@ -292,7 +297,9 @@ class BTSearchResultPanel extends StatelessWidget {
                     width: 140.w,
                     child: Center(
                       child: Icon(
-                        searchResult.type == "busStop" ? Icons.location_on : Icons.directions_bus,
+                        searchResult.type == "busStop"
+                            ? Icons.location_on
+                            : Icons.directions_bus,
                         size: 120.sp,
                         color: AppColors.hintGray(ref),
                       ),

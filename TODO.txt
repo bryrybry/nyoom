@@ -1,0 +1,10 @@
+- STORE DIRECTION
+- W/G Buses
+- localstorage
+- test 185
+- same element transition
+- anims
+- icons helper tooltip
+- store the path of buslist when sub-childing
+- test longest text for all ui
+- no buses avaialbe message (-3)

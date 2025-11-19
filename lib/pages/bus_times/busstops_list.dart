@@ -7,8 +7,10 @@ import 'package:nyoom/classes/colors.dart';
 import 'package:nyoom/classes/data_models/bus_arrival.dart';
 import 'package:nyoom/classes/data_models/bus_service.dart';
 import 'package:nyoom/classes/data_models/bus_stop.dart';
+import 'package:nyoom/classes/data_models/bus_times_search_result.dart';
 import 'package:nyoom/classes/static_data.dart';
 import 'package:nyoom/pages/bus_times/arrival_time_display.dart';
+import 'package:nyoom/pages/bus_times/bt_list.dart';
 import 'package:nyoom/services/api_service.dart';
 
 class BusStopsList extends ConsumerStatefulWidget {
@@ -21,77 +23,137 @@ class BusStopsList extends ConsumerStatefulWidget {
 }
 
 class _BusStopsListState extends ConsumerState<BusStopsList> {
+  late Map<String, Map<String, List<dynamic>>> busStopsMapStaticData;
+  late List<BusStop> busStopsStaticData;
   late BusService busService;
   final List<BusStopAT> stops = [];
-  final List<BusStopAT> stops2 = [];
   bool isOtherDirection = false;
+  bool hasOtherDirection = false;
 
   @override
   void initState() {
     super.initState();
     busService = widget.busService;
-    generateList();
+    init();
   }
-  // TODO: STORE DIRECTION
-  // TODO: W/G Buses
+  Future<void> init() async {
+    busStopsMapStaticData = await StaticData.busStopsMap();
+    busStopsStaticData = await StaticData.busStops();
+    await initList();
+    await refreshList();
+  }
 
-  void generateList() {
-    StaticData.busStopsMap().then((data) async {
-      List<BusStopAT> tempStops = [];
-      List<BusStopAT> tempStops2 = [];
-      List<BusStop> allBusStops = await StaticData.busStops();
-      for (var service in data.entries) {
-        if (service.key == busService.busService) {
-          for (var stop in service.value["1"] ?? []) {
-            tempStops.add(
-              BusStopAT.fromBusStopCode(
-                stop[0],
-                await ApiService.busArrival(stop[0], busService.busService),
-                allBusStops,
-              ),
-            );
-          }
-          for (var stop in service.value["2"] ?? []) {
-            tempStops2.add(
-              BusStopAT.fromBusStopCode(
-                stop[0],
-                await ApiService.busArrival(stop[0], busService.busService),
-                allBusStops,
-              ),
-            );
-          }
-          break;
-        }
-      }
-      setState(() {
-        stops.clear();
-        stops2.clear();
-        stops.addAll(tempStops);
-        if (tempStops2.isNotEmpty) {
-          stops2.addAll(tempStops2);
-        }
-      });
+  Future<void> initList() async {
+    List<BusStopAT> tempStops = [];
+
+    String selectedDirection = isOtherDirection ? "2" : "1";
+    hasOtherDirection =
+        busStopsMapStaticData[busService.busService]?.containsKey("2") ?? false;
+
+    List<String> busStopCodes =
+        (busStopsMapStaticData[busService.busService]?[selectedDirection]
+                    ?.map((e) => e[0])
+                    .toList()
+                as List<dynamic>)
+            .cast<String>();
+    List<BusArrivalService> arrivalServices = busStopCodes.map((e) {
+      return BusArrivalService.initBusArrivalService();
+    }).toList();
+    for (int index = 0; index < arrivalServices.length; index++) {
+      tempStops.add(
+        BusStopAT.fromBusStopCode(
+          busStopCodes[index],
+          arrivalServices[index],
+          busStopsStaticData,
+        ),
+      );
+    }
+    if (!mounted) return;
+    setState(() {
+      stops
+        ..clear()
+        ..addAll(tempStops);
     });
+  }
+
+  Future<void> refreshList() async {
+    List<BusStopAT> tempStops = [];
+
+    String selectedDirection = isOtherDirection ? "2" : "1";
+    hasOtherDirection =
+        busStopsMapStaticData[busService.busService]?.containsKey("2") ?? false;
+
+    List<String> busStopCodes =
+        (busStopsMapStaticData[busService.busService]?[selectedDirection]
+                    ?.map((e) => e[0])
+                    .toList()
+                as List<dynamic>)
+            .cast<String>();
+    List<BusArrivalService> arrivalServices =
+        await ApiService.busArrivalMultiqueue(
+          busStopCodes: busStopCodes,
+          busServices: [busService.busService],
+        );
+    for (int index = 0; index < arrivalServices.length; index++) {
+      tempStops.add(
+        BusStopAT.fromBusStopCode(
+          busStopCodes[index],
+          arrivalServices[index],
+          busStopsStaticData,
+        ),
+      );
+    }
+    if (!mounted) return;
+    setState(() {
+      stops
+        ..clear()
+        ..addAll(tempStops);
+    });
+  }
+
+  Future<void> refreshAT(BusStopAT busStopAT) async {
+    for (int n = 0; n < stops.length; n++) {
+      if (stops[n].busStopCode == busStopAT.busStopCode) {
+        setState(() {
+          stops[n] = BusStopAT.fromBusStopCode(
+            busStopAT.busStopCode,
+            BusArrivalService.initBusArrivalService(),
+            busStopsStaticData,
+          );
+        });
+        final newArrival = await ApiService.busArrival(
+          busStopAT.busStopCode,
+          busService.busService,
+        );
+        if (!mounted) return;
+        setState(() {
+          stops[n] = BusStopAT.fromBusStopCode(
+            busStopAT.busStopCode,
+            newArrival,
+            busStopsStaticData,
+          );
+        });
+        return;
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    List<BusStopAT> selectedStops = isOtherDirection ? stops2 : stops;
     return Column(
       children: [
-        if (stops2.isNotEmpty)
+        if (hasOtherDirection)
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 40.w),
             child: GestureDetector(
               onTap: () {
                 setState(() {
                   isOtherDirection = !isOtherDirection;
+                  refreshList();
                 });
               },
               child: AutoSizeText(
-                !isOtherDirection
-                    ? "${selectedStops[0].busStopName}  ▷  ${selectedStops[selectedStops.length - 1].busStopName}"
-                    : "${selectedStops[selectedStops.length - 1].busStopName}  ◁  ${selectedStops[0].busStopName}",
+                "${stops[0].busStopName}  ▷  ${stops[stops.length - 1].busStopName}",
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -102,7 +164,7 @@ class _BusStopsListState extends ConsumerState<BusStopsList> {
               ),
             ),
           ),
-        if (stops2.isNotEmpty) SizedBox(height: 40.h),
+        if (hasOtherDirection) SizedBox(height: 40.h),
         Expanded(
           child: GridView.builder(
             key: ValueKey(isOtherDirection),
@@ -114,9 +176,14 @@ class _BusStopsListState extends ConsumerState<BusStopsList> {
               crossAxisSpacing: 20.w,
               childAspectRatio: 3.45,
             ),
-            itemCount: selectedStops.length,
+            itemCount: stops.length,
             itemBuilder: (context, index) {
-              return BusStopPanel(busStopAT: selectedStops[index]);
+              return BusStopPanel(
+                busStopAT: stops[index],
+                onRefresh: () {
+                  refreshAT(stops[index]);
+                },
+              );
             },
           ),
         ),
@@ -127,8 +194,13 @@ class _BusStopsListState extends ConsumerState<BusStopsList> {
 
 class BusStopPanel extends ConsumerStatefulWidget {
   final BusStopAT busStopAT;
+  final VoidCallback? onRefresh;
 
-  const BusStopPanel({super.key, required this.busStopAT});
+  const BusStopPanel({
+    super.key,
+    required this.busStopAT,
+    required this.onRefresh,
+  });
 
   @override
   ConsumerState<BusStopPanel> createState() => _BusStopPanelState();
@@ -136,6 +208,7 @@ class BusStopPanel extends ConsumerStatefulWidget {
 
 class _BusStopPanelState extends ConsumerState<BusStopPanel> {
   late BusStopAT busStopAT;
+
   @override
   void initState() {
     super.initState();
@@ -143,21 +216,27 @@ class _BusStopPanelState extends ConsumerState<BusStopPanel> {
   }
 
   @override
+  void didUpdateWidget(covariant BusStopPanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.busStopAT != widget.busStopAT) {
+      setState(() {
+        busStopAT = widget.busStopAT;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SizedBox(
-      child: ElevatedButton(
-        onPressed: () {},
-        style: ElevatedButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(80.r),
-          ),
-          backgroundColor: AppColors.buttonPanel(ref),
-          elevation: 3,
+      child: Material(
+        elevation: 3,
+        color: AppColors.buttonPanel(ref),
+        borderRadius: BorderRadius.circular(80.r),
+        child: Container(
           padding: EdgeInsets.zero,
-        ),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 20.h),
-          child: Expanded(
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(80.r)),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 20.h),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -166,19 +245,33 @@ class _BusStopPanelState extends ConsumerState<BusStopPanel> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(
-                        height: 120.h,
-                        child: AutoSizeText(
-                          busStopAT.busStopName,
-                          maxLines: 2,
-                          minFontSize: (48.sp).roundToDouble(),
-                          maxFontSize: (84.sp).roundToDouble(),
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 84.sp,
-                            color: AppColors.primary(ref),
-                            fontWeight: FontWeight.w800,
-                            height: 1.0,
+                      GestureDetector(
+                        onTap: () {
+                          ref
+                              .read(navigationProvider)
+                              ?.call(
+                                BTList(
+                                  key: ValueKey(busStopAT.busStopCode),
+                                  searchResult: BTSearchResult.fromBusStop(
+                                    busStopAT,
+                                  ),
+                                ),
+                              );
+                        },
+                        child: SizedBox(
+                          height: 120.h,
+                          child: AutoSizeText(
+                            busStopAT.busStopName,
+                            maxLines: 2,
+                            minFontSize: (48.sp).roundToDouble(),
+                            maxFontSize: (84.sp).roundToDouble(),
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 84.sp,
+                              color: AppColors.primary(ref),
+                              fontWeight: FontWeight.w800,
+                              height: 1.0,
+                            ),
                           ),
                         ),
                       ),
@@ -215,6 +308,7 @@ class _BusStopPanelState extends ConsumerState<BusStopPanel> {
                 ),
                 ArrivalTimeDisplay(
                   busArrivalService: busStopAT.busArrivalService,
+                  onRefresh: widget.onRefresh,
                 ),
               ],
             ),

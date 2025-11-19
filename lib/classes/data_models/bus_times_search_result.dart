@@ -1,3 +1,4 @@
+import 'package:nyoom/classes/data_models/bus_service.dart';
 import 'package:nyoom/classes/data_models/bus_stop.dart';
 
 class BTSearchResult {
@@ -25,11 +26,11 @@ class BTSearchResult {
     );
   }
 
-  factory BTSearchResult.fromBusService(String service) {
+  factory BTSearchResult.fromBusService(BusService busService) {
     return BTSearchResult(
       type: "busService",
-      value: service,
-      header: service,
+      value: busService.busService,
+      header: busService.busService,
       subheader1: "Bus Service",
       subheader2: "",
     );

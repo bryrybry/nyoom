@@ -50,9 +50,9 @@ class BusStopAT extends BusStop {
   factory BusStopAT.fromBusStopCode(
     String busStopCode,
     BusArrivalService busArrivalService,
-    List<BusStop> busStops,
+    List<BusStop> staticDataBusStops,
   ) {
-    for (BusStop busStop in busStops) {
+    for (BusStop busStop in staticDataBusStops) {
       if (busStop.busStopCode == busStopCode) {
         return BusStopAT(
           busStopCode: busStop.busStopCode,

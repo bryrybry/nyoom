@@ -3,10 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nyoom/app_state.dart';
 import 'package:nyoom/classes/colors.dart';
+import 'package:nyoom/classes/data_models/bus_arrival.dart';
 import 'package:nyoom/classes/data_models/bus_service.dart';
 import 'package:nyoom/classes/data_models/bus_stop.dart';
+import 'package:nyoom/classes/data_models/bus_times_search_result.dart';
 import 'package:nyoom/classes/static_data.dart';
 import 'package:nyoom/pages/bus_times/arrival_time_display.dart';
+import 'package:nyoom/pages/bus_times/bt_list.dart';
 import 'package:nyoom/services/api_service.dart';
 
 class BusServicesList extends ConsumerStatefulWidget {
@@ -19,6 +22,7 @@ class BusServicesList extends ConsumerStatefulWidget {
 }
 
 class _BusServicesListState extends ConsumerState<BusServicesList> {
+  late Map<String, List<String>> busServicesAtStopStaticData;
   late BusStop busStop;
   final List<BusServiceAT> services = [];
 
@@ -26,33 +30,88 @@ class _BusServicesListState extends ConsumerState<BusServicesList> {
   void initState() {
     super.initState();
     busStop = widget.busStop;
-    generateList();
+    init();
   }
 
-  void generateList() {
-    StaticData.busServicesAtStop().then((data) async {
-      List<BusServiceAT> tempServices = [];
-      for (var stop in data.entries) {
-        if (stop.key == busStop.busStopCode) {
-          for (String service in stop.value) {
-            tempServices.add(
-              BusServiceAT(
-                busService: service,
-                busArrivalService: await ApiService.busArrival(
-                  busStop.busStopCode,
-                  service,
-                ),
-              ),
-            );
-          }
-          break;
-        }
-      }
-      setState(() {
-        services.clear();
-        services.addAll(tempServices);
-      });
+  Future<void> init() async {
+    busServicesAtStopStaticData = await StaticData.busServicesAtStop();
+    await initList();
+    await refreshList();
+  }
+
+  Future<void> initList() async {
+    List<BusServiceAT> tempServices = [];
+
+    List<String> busServices =
+        busServicesAtStopStaticData[busStop.busStopCode] ?? [];
+    List<BusArrivalService> arrivalServices = busServices.map((e) {
+      return BusArrivalService.initBusArrivalService();
+    }).toList();
+    for (int index = 0; index < arrivalServices.length; index++) {
+      tempServices.add(
+        BusServiceAT(
+          busService: busServices[index],
+          busArrivalService: arrivalServices[index],
+        ),
+      );
+    }
+    if (!mounted) return;
+    setState(() {
+      services
+        ..clear()
+        ..addAll(tempServices);
     });
+  }
+
+  Future<void> refreshList() async {
+    List<BusServiceAT> tempServices = [];
+
+    List<String> busServices =
+        busServicesAtStopStaticData[busStop.busStopCode] ?? [];
+    List<BusArrivalService> arrivalServices =
+        await ApiService.busArrivalMultiqueue(
+          busStopCodes: [busStop.busStopCode],
+          busServices: busServices,
+        );
+    for (int index = 0; index < arrivalServices.length; index++) {
+      tempServices.add(
+        BusServiceAT(
+          busService: busServices[index],
+          busArrivalService: arrivalServices[index],
+        ),
+      );
+    }
+    if (!mounted) return;
+    setState(() {
+      services
+        ..clear()
+        ..addAll(tempServices);
+    });
+  }
+
+  Future<void> refreshAT(BusServiceAT busServiceAT) async {
+    for (int n = 0; n < services.length; n++) {
+      if (services[n].busService == busServiceAT.busService) {
+        setState(() {
+          services[n] = BusServiceAT(
+            busService: busServiceAT.busService,
+            busArrivalService: BusArrivalService.initBusArrivalService(),
+          );
+        });
+        final newArrival = await ApiService.busArrival(
+          busStop.busStopCode,
+          busServiceAT.busService,
+        );
+        if (!mounted) return;
+        setState(() {
+          services[n] = BusServiceAT(
+            busService: busServiceAT.busService,
+            busArrivalService: newArrival,
+          );
+        });
+        return;
+      }
+    }
   }
 
   @override
@@ -68,7 +127,12 @@ class _BusServicesListState extends ConsumerState<BusServicesList> {
       ),
       itemCount: services.length,
       itemBuilder: (context, index) {
-        return BusServicePanel(busServiceAT: services[index]);
+        return BusServicePanel(
+          busServiceAT: services[index],
+          onRefresh: () {
+            refreshAT(services[index]);
+          },
+        );
       },
     );
   }
@@ -76,8 +140,13 @@ class _BusServicesListState extends ConsumerState<BusServicesList> {
 
 class BusServicePanel extends ConsumerStatefulWidget {
   final BusServiceAT busServiceAT;
+  final VoidCallback? onRefresh;
 
-  const BusServicePanel({super.key, required this.busServiceAT});
+  const BusServicePanel({
+    super.key,
+    required this.busServiceAT,
+    required this.onRefresh,
+  });
 
   @override
   ConsumerState<BusServicePanel> createState() => _BusServicePanelState();
@@ -92,49 +161,72 @@ class _BusServicePanelState extends ConsumerState<BusServicePanel> {
   }
 
   @override
+  void didUpdateWidget(covariant BusServicePanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.busServiceAT != widget.busServiceAT) {
+      setState(() {
+        busServiceAT = widget.busServiceAT;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {},
-      style: ElevatedButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(80.r),
-        ),
-        backgroundColor: AppColors.buttonPanel(ref),
-        elevation: 3,
+    return Material(
+      elevation: 3,
+      color: AppColors.buttonPanel(ref),
+      borderRadius: BorderRadius.circular(80.r),
+      child: Container(
         padding: EdgeInsets.zero,
-      ),
-      child: Center(
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 40.w),
-          child: Column(
-            children: [
-              Text(
-                "Bus",
-                style: TextStyle(
-                  fontSize: 42.sp,
-                  color: AppColors.hintGray(ref),
-                  fontWeight: FontWeight.w400,
-                  height: 1.0,
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(80.r)),
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 40.w),
+            child: Column(
+              children: [
+                Text(
+                  "Bus",
+                  style: TextStyle(
+                    fontSize: 42.sp,
+                    color: AppColors.hintGray(ref),
+                    fontWeight: FontWeight.w400,
+                    height: 1.0,
+                  ),
                 ),
-              ),
-              Text(
-                busServiceAT.busService,
-                style: TextStyle(
-                  fontSize: 192.sp,
-                  color: AppColors.primary(ref),
-                  fontWeight: FontWeight.w800,
-                  height: 1.0,
+                GestureDetector(
+                  onTap: () {
+                    ref
+                        .read(navigationProvider)
+                        ?.call(
+                          BTList(
+                            key: ValueKey(busServiceAT.busService),
+                            searchResult: BTSearchResult.fromBusService(
+                              busServiceAT,
+                            ),
+                          ),
+                        );
+                  },
+                  child: Text(
+                    busServiceAT.busService,
+                    style: TextStyle(
+                      fontSize: 180.sp,
+                      color: AppColors.primary(ref),
+                      fontWeight: FontWeight.w800,
+                      height: 1.0,
+                    ),
+                  ),
                 ),
-              ),
-              SizedBox(
-                height: 5.h,
-                width: double.infinity,
-                child: Container(color: AppColors.darkGray(ref)),
-              ),
-              ArrivalTimeDisplay(
-                busArrivalService: busServiceAT.busArrivalService,
-              ),
-            ],
+                SizedBox(
+                  height: 5.h,
+                  width: double.infinity,
+                  child: Container(color: AppColors.darkGray(ref)),
+                ),
+                ArrivalTimeDisplay(
+                  busArrivalService: busServiceAT.busArrivalService,
+                  onRefresh: widget.onRefresh,
+                ),
+              ],
+            ),
           ),
         ),
       ),
