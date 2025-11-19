@@ -128,7 +128,7 @@ class _ArrivalTimeDisplayState extends ConsumerState<ArrivalTimeDisplay> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Text(
-                        "Next:  ",
+                        "Next: ",
                         style: TextStyle(
                           fontSize: 56.sp,
                           color: AppColors.hintGray(ref),
@@ -148,7 +148,7 @@ class _ArrivalTimeDisplayState extends ConsumerState<ArrivalTimeDisplay> {
                       Text(
                         ", ",
                         style: TextStyle(
-                          fontSize: 96.sp,
+                          fontSize: 84.sp,
                           color: AppColors.hintGray(ref),
                           fontWeight: FontWeight.w800,
                           height: 1.0,

@@ -33,8 +33,6 @@ class _BookmarksState extends ConsumerState<Settings> {
               icon: Icons.notifications,
               ref: ref,
               onPressed: () async {
-                final data = await StaticData.busStops();
-                print(data);
               },
             ),
             CircleButton(

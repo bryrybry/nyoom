@@ -81,7 +81,6 @@ class _BusTiming {
   }
 
   static Future<_BusTiming> fromJson(Map<String, dynamic> json) async {
-    print(json);
     return _BusTiming(
       arrivalTime: await minutesFromNow(json["EstimatedArrival"]),
       isDoubleDecker: json["Type"] == "DD",

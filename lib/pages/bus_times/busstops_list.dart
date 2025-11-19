@@ -102,7 +102,7 @@ class _BusStopsListState extends ConsumerState<BusStopsList> {
               ),
             ),
           ),
-        SizedBox(height: 40.h),
+        if (stops2.isNotEmpty) SizedBox(height: 40.h),
         Expanded(
           child: GridView.builder(
             key: ValueKey(isOtherDirection),
