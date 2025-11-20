@@ -4,12 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nyoom/app_state.dart';
 import 'package:nyoom/classes/colors.dart';
+import 'package:nyoom/classes/data_models/bookmark.dart';
 import 'package:nyoom/classes/data_models/bus_arrival.dart';
 import 'package:nyoom/classes/data_models/bus_service.dart';
 import 'package:nyoom/classes/data_models/bus_stop.dart';
 import 'package:nyoom/classes/data_models/bus_times_search_result.dart';
 import 'package:nyoom/classes/static_data.dart';
 import 'package:nyoom/pages/bus_times/arrival_time_display.dart';
+import 'package:nyoom/pages/bus_times/bookmark_star.dart';
 import 'package:nyoom/pages/bus_times/bt_list.dart';
 import 'package:nyoom/services/api_service.dart';
 
@@ -36,6 +38,7 @@ class _BusStopsListState extends ConsumerState<BusStopsList> {
     busService = widget.busService;
     init();
   }
+
   Future<void> init() async {
     busStopsMapStaticData = await StaticData.busStopsMap();
     busStopsStaticData = await StaticData.busStops();
@@ -148,18 +151,39 @@ class _BusStopsListState extends ConsumerState<BusStopsList> {
             child: GestureDetector(
               onTap: () {
                 setState(() {
+                  if (stops[0].busArrivalService.nextBus.arrivalTime == -2) {
+                    return;
+                  }
                   isOtherDirection = !isOtherDirection;
+                  initList();
                   refreshList();
                 });
               },
-              child: AutoSizeText(
-                "${stops[0].busStopName}  ▷  ${stops[stops.length - 1].busStopName}",
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: AppColors.white,
-                  fontSize: 60.sp,
-                  fontWeight: FontWeight.w800,
+              child: Material(
+                elevation: 3,
+                color: AppColors.buttonPanel(ref),
+                borderRadius: BorderRadius.circular(80.r),
+                child: Container(
+                  padding: EdgeInsets.zero,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(80.r),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 40.w,
+                      vertical: 20.h,
+                    ),
+                    child: AutoSizeText(
+                      "${stops[0].busStopName}  ▷  ${stops[stops.length - 1].busStopName}",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: AppColors.white,
+                        fontSize: 60.sp,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -183,6 +207,7 @@ class _BusStopsListState extends ConsumerState<BusStopsList> {
                 onRefresh: () {
                   refreshAT(stops[index]);
                 },
+                bookmark: Bookmark.fromBusDataModels(stops[index], busService),
               );
             },
           ),
@@ -195,11 +220,13 @@ class _BusStopsListState extends ConsumerState<BusStopsList> {
 class BusStopPanel extends ConsumerStatefulWidget {
   final BusStopAT busStopAT;
   final VoidCallback? onRefresh;
+  final Bookmark bookmark;
 
   const BusStopPanel({
     super.key,
     required this.busStopAT,
     required this.onRefresh,
+    required this.bookmark,
   });
 
   @override
@@ -241,59 +268,70 @@ class _BusStopPanelState extends ConsumerState<BusStopPanel> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Stack(
                     children: [
-                      GestureDetector(
-                        onTap: () {
-                          ref
-                              .read(navigationProvider)
-                              ?.call(
-                                BTList(
-                                  key: ValueKey(busStopAT.busStopCode),
-                                  searchResult: BTSearchResult.fromBusStop(
-                                    busStopAT,
-                                  ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              ref
+                                  .read(navigationProvider)
+                                  ?.call(
+                                    BTList(
+                                      key: ValueKey(busStopAT.busStopCode),
+                                      searchResult: BTSearchResult.fromBusStop(
+                                        busStopAT,
+                                      ),
+                                    ),
+                                  );
+                            },
+                            child: SizedBox(
+                              height: 120.h,
+                              child: AutoSizeText(
+                                busStopAT.busStopName,
+                                maxLines: 2,
+                                minFontSize: (48.sp).roundToDouble(),
+                                maxFontSize: (84.sp).roundToDouble(),
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 84.sp,
+                                  color: AppColors.primary(ref),
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.0,
                                 ),
-                              );
-                        },
-                        child: SizedBox(
-                          height: 120.h,
-                          child: AutoSizeText(
-                            busStopAT.busStopName,
-                            maxLines: 2,
-                            minFontSize: (48.sp).roundToDouble(),
-                            maxFontSize: (84.sp).roundToDouble(),
-                            overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            busStopAT.roadName,
                             style: TextStyle(
-                              fontSize: 84.sp,
-                              color: AppColors.primary(ref),
-                              fontWeight: FontWeight.w800,
+                              fontSize: 48.sp,
+                              color: ref.watch(isDarkModeProvider)
+                                  ? AppColors.nyoomYellow(ref)
+                                  : AppColors.nyoomDarkYellow,
+                              fontWeight: FontWeight.w600,
+                              height: 1.0,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          Text(
+                            "(${busStopAT.busStopCode})",
+                            style: TextStyle(
+                              fontSize: 48.sp,
+                              color: AppColors.hintGray(ref),
+                              fontWeight: FontWeight.w500,
                               height: 1.0,
                             ),
                           ),
-                        ),
+                        ],
                       ),
-                      Text(
-                        busStopAT.roadName,
-                        style: TextStyle(
-                          fontSize: 48.sp,
-                          color: ref.watch(isDarkModeProvider)
-                              ? AppColors.nyoomYellow(ref)
-                              : AppColors.nyoomDarkYellow,
-                          fontWeight: FontWeight.w600,
-                          height: 1.0,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      Text(
-                        "(${busStopAT.busStopCode})",
-                        style: TextStyle(
-                          fontSize: 48.sp,
-                          color: AppColors.hintGray(ref),
-                          fontWeight: FontWeight.w500,
-                          height: 1.0,
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: Transform.translate(
+                          offset: Offset(0, -16.h),
+                          child: BookmarkStar(bookmark: widget.bookmark),
                         ),
                       ),
                     ],

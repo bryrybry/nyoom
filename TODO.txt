@@ -1,6 +1,5 @@
 - STORE DIRECTION
 - W/G Buses
-- localstorage
 - test 185
 - same element transition
 - anims

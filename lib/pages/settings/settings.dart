@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nyoom/app_state.dart';
-import 'package:nyoom/classes/static_data.dart';
 import 'package:nyoom/main.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nyoom/classes/colors.dart';
+import 'package:nyoom/test.dart';
 
 class Settings extends ConsumerStatefulWidget implements HasPageTitle {
   const Settings({super.key});
@@ -77,6 +77,12 @@ class _BookmarksState extends ConsumerState<Settings> {
             ref.read(isDarkModeProvider.notifier).toggleTheme();
           },
         ),
+            FloatingActionButton(
+              onPressed: () async {
+                testFunction(ref);
+              },
+              child: Text("a nice test button"),
+            ),
       ],
     );
   }

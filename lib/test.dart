@@ -1,15 +1,9 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nyoom/app_state.dart';
+import 'package:nyoom/classes/data_models/bus_stop.dart';
+import 'package:nyoom/classes/static_data.dart';
 import 'package:nyoom/services/api_service.dart';
 
-void testFunction() async {
-  // final data = await ApiService.busArrivalMultiqueue([
-  //   "46009",
-  //   "46631",
-  //   "46331",
-  //   "46971",
-  // ], "901");
-
-  // for (final future in data) {
-  //   final value = await future; // await the future
-  //   print(value.nextBus.arrivalTime); // print actual service number
-  // }
+void testFunction(WidgetRef ref) async {
+  print(ref.read(bookmarksProvider.notifier).getBookmarks());
 }

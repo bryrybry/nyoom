@@ -43,23 +43,30 @@ class ApiService {
       );
     }
 
-    final futures = requestPairs.map((pair) {
-      return DatamallApiService.dio.get(
-        '/BusArrival',
-        queryParameters: {'BusStopCode': pair.key, 'ServiceNo': pair.value},
-      );
-    }).toList();
+    final futures = requestPairs.map((pair) async {
+      try {
+        final response = await DatamallApiService.dio.get(
+          '/BusArrival',
+          queryParameters: {'BusStopCode': pair.key, 'ServiceNo': pair.value},
+        );
 
-    final responses = await Future.wait(futures);
+        final busArrival = await BusArrival.fromJson(response.data);
 
-    final services = responses.map((r) async {
-      final busArrival = await BusArrival.fromJson(r.data);
-      if (busArrival.services.isEmpty) {
+        if (busArrival.services.isEmpty) {
+          return BusArrivalService.defaultBusArrivalService();
+        }
+
+        return busArrival.services.first;
+      } catch (e) {
+        // Log and return fallback instead of crashing
+        print(
+          "Failed bus arrival request for stop ${pair.key}, service ${pair.value}: $e",
+        );
+
         return BusArrivalService.defaultBusArrivalService();
       }
-      return busArrival.services.first;
-    });
+    }).toList();
 
-    return Future.wait(services);
+    return Future.wait(futures);
   }
 }
