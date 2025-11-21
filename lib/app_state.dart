@@ -8,7 +8,7 @@ Future<void> initHive() async {
   await Hive.initFlutter(); 
   await Hive.openBox('settings');
   Hive.registerAdapter(BookmarkAdapter());
-  await Hive.openBox<Map>('bookmarks');
+  await Hive.openBox<List>('bookmarks');
 }
 
 // Dark/Light Mode
@@ -31,44 +31,40 @@ class DarkModeNotifier extends Notifier<bool> {
   }
 }
 
-final bookmarksProvider = NotifierProvider<BookmarksNotifier, Map<String, Bookmark>>(
+final bookmarksProvider = NotifierProvider<BookmarksNotifier, List<Bookmark>>(
   () => BookmarksNotifier(),
 );
 
-class BookmarksNotifier extends Notifier<Map<String, Bookmark>> {
-  late final Box<Map> _box;
+class BookmarksNotifier extends Notifier<List<Bookmark>> {
+  late final Box<List> _box;
 
   @override
-  Map<String, Bookmark> build() {
-    _box = Hive.box<Map>('bookmarks');
+  List<Bookmark> build() {
+    _box = Hive.box<List>('bookmarks');
     final saved = _box.get('bookmarks');
     if (saved != null) {
-      return Map<String, Bookmark>.from(saved);
+      return List<Bookmark>.from(saved);
     }
-    return {};
+    return [];
   }
 
-  String _key(Bookmark bookmark) => '${bookmark.busStopCode}_${bookmark.busService}';
+  bool _equals(Bookmark a, Bookmark b) =>
+      a.busStopCode == b.busStopCode && a.busService == b.busService;
 
   void addBookmark(Bookmark bookmark) {
-    final key = _key(bookmark);
-    state = {
-      ...state,
-      key: bookmark,
-    };
-    _box.put('bookmarks', state);
+    if (!state.any((b) => _equals(b, bookmark))) {
+      state = [...state, bookmark];
+      _box.put('bookmarks', state);
+    }
   }
 
   void removeBookmark(Bookmark bookmark) {
-    final key = _key(bookmark);
-    final newState = Map<String, Bookmark>.from(state)..remove(key);
-    state = newState;
+    state = state.where((b) => !_equals(b, bookmark)).toList();
     _box.put('bookmarks', state);
   }
 
   void toggleBookmark(Bookmark bookmark) {
-    final key = _key(bookmark);
-    if (state.containsKey(key)) {
+    if (state.any((b) => _equals(b, bookmark))) {
       removeBookmark(bookmark);
     } else {
       addBookmark(bookmark);
@@ -76,16 +72,15 @@ class BookmarksNotifier extends Notifier<Map<String, Bookmark>> {
   }
 
   bool bookmarkExists(Bookmark bookmark) {
-    final key = _key(bookmark);
-    return state.containsKey(key);
+    return state.any((b) => _equals(b, bookmark));
   }
 
-  Map<String, Bookmark> getBookmarks() {
+  List<Bookmark> getBookmarks() {
     final saved = _box.get('bookmarks');
     if (saved != null) {
-      return Map<String, Bookmark>.from(saved);
+      return List<Bookmark>.from(saved);
     }
-    return {};
+    return [];
   }
 }
 

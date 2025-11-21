@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:nyoom/classes/data_models/bus_arrival.dart';
 import 'package:nyoom/classes/data_models/bus_service.dart';
 import 'package:nyoom/classes/data_models/bus_stop.dart';
 
@@ -31,6 +32,31 @@ class Bookmark {
       busStopCode: busStop.busStopCode,
       roadName: busStop.roadName,
       busStopName: busStop.busStopName,
+    );
+  }
+}
+
+class BookmarkAT extends Bookmark {
+  final BusArrivalService busArrivalService;
+
+  BookmarkAT({
+    required this.busArrivalService,
+    required super.busService,
+    required super.busStopCode,
+    required super.roadName,
+    required super.busStopName,
+  });
+
+  factory BookmarkAT.fromBookmark(
+    Bookmark bookmark,
+    BusArrivalService busArrivalService,
+  ) {
+    return BookmarkAT(
+      busArrivalService: busArrivalService,
+      busService: bookmark.busService,
+      busStopCode: bookmark.busStopCode,
+      roadName: bookmark.roadName,
+      busStopName: bookmark.busStopName,
     );
   }
 }

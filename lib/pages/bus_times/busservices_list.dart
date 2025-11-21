@@ -46,7 +46,7 @@ class _BusServicesListState extends ConsumerState<BusServicesList> {
 
     List<String> busServices =
         busServicesAtStopStaticData[busStop.busStopCode] ?? [];
-    List<BusArrivalService> arrivalServices = busServices.map((e) {
+    List<BusArrivalService> arrivalServices = busServices.map((_) {
       return BusArrivalService.initBusArrivalService();
     }).toList();
     for (int index = 0; index < arrivalServices.length; index++) {
@@ -125,7 +125,7 @@ class _BusServicesListState extends ConsumerState<BusServicesList> {
         crossAxisCount: 2,
         mainAxisSpacing: 20.h,
         crossAxisSpacing: 20.w,
-        childAspectRatio: 1,
+        childAspectRatio: 0.975,
       ),
       itemCount: services.length,
       itemBuilder: (context, index) {
@@ -223,10 +223,13 @@ class _BusServicePanelState extends ConsumerState<BusServicePanel> {
                         ),
                       ),
                     ),
-                    SizedBox(
-                      height: 5.h,
-                      width: double.infinity,
-                      child: Container(color: AppColors.darkGray(ref)),
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10.h),
+                      child: SizedBox(
+                        height: 5.h,
+                        width: double.infinity,
+                        child: Container(color: AppColors.darkGray(ref)),
+                      ),
                     ),
                     ArrivalTimeDisplay(
                       busArrivalService: busServiceAT.busArrivalService,

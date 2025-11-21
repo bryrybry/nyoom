@@ -19,7 +19,18 @@ class Helper {
     }
   }
 
-  static Future<List<String>> loadBusServices() async {
-    return await Helper.readJSON('bus_services.json'); 
+  static String twoLineTextBalancer(String text, int threshold) {
+    if (text.length <= threshold) {
+      return text;
+    }
+    int mid = (text.length / 2).round();
+    int split = text.lastIndexOf(' ', mid);
+    if (split == -1) {
+      split = text.indexOf(' ', mid);
+    }
+    if (split == -1) {
+      split = mid;
+    }
+    return '${text.substring(0, split).trim()}\n${text.substring(split).trim()}';
   }
 }

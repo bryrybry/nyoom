@@ -59,7 +59,7 @@ class _BusStopsListState extends ConsumerState<BusStopsList> {
                     .toList()
                 as List<dynamic>)
             .cast<String>();
-    List<BusArrivalService> arrivalServices = busStopCodes.map((e) {
+    List<BusArrivalService> arrivalServices = busStopCodes.map((_) {
       return BusArrivalService.initBusArrivalService();
     }).toList();
     for (int index = 0; index < arrivalServices.length; index++) {

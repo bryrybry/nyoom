@@ -69,4 +69,10 @@ class ApiService {
 
     return Future.wait(futures);
   }
+
+  static Future<List<BusArrivalService>> busArrivalMultiqueueByPairs(
+    List<MapEntry<String, String>> pairs,
+  ) async {
+    return await Future.wait(pairs.map((p) => busArrival(p.key, p.value)));
+  }
 }

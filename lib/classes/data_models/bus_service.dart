@@ -14,8 +14,4 @@ class BusServiceAT extends BusService {
   final BusArrivalService busArrivalService;
 
   BusServiceAT({required super.busService, required this.busArrivalService});
-
-  BusArrivalService getArrivalTimes() {
-    return busArrivalService;
-  }
 }

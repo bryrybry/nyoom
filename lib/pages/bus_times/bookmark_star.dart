@@ -7,8 +7,13 @@ import 'package:nyoom/classes/data_models/bookmark.dart';
 
 class BookmarkStar extends ConsumerStatefulWidget {
   final Bookmark bookmark;
+  final VoidCallback? onTap;
 
-  const BookmarkStar({super.key, required this.bookmark});
+  const BookmarkStar({
+    super.key,
+    required this.bookmark,
+    this.onTap,
+  });
 
   @override
   ConsumerState<BookmarkStar> createState() => _BookmarkStarState();
@@ -22,7 +27,9 @@ class _BookmarkStarState extends ConsumerState<BookmarkStar> {
   void initState() {
     super.initState();
     bookmark = widget.bookmark;
-    isBookmarked = ref.read(bookmarksProvider.notifier).bookmarkExists(bookmark);
+    isBookmarked = ref
+        .read(bookmarksProvider.notifier)
+        .bookmarkExists(bookmark);
   }
 
   @override
@@ -30,6 +37,10 @@ class _BookmarkStarState extends ConsumerState<BookmarkStar> {
     return GestureDetector(
       onTap: () {
         setState(() {
+          if (widget.onTap != null) {
+            widget.onTap?.call();
+            return;
+          }
           ref.read(bookmarksProvider.notifier).toggleBookmark(bookmark);
           isBookmarked = !isBookmarked;
         });
