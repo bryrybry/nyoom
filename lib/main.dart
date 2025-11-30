@@ -5,6 +5,7 @@ import 'package:nyoom/app_state.dart';
 import 'package:nyoom/classes/colors.dart';
 import 'package:nyoom/pages/bookmarks/bookmarks.dart';
 import 'package:nyoom/pages/bus_times/bus_times.dart';
+import 'package:nyoom/pages/misc/startup.dart';
 import 'package:nyoom/pages/travel_routes/travel_routes.dart';
 import 'package:nyoom/pages/settings/settings.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -67,7 +68,7 @@ class Nyoom extends ConsumerWidget {
           outline: AppColors.darkGray(ref),
         ),
       ),
-      themeMode: ref.watch(isDarkModeProvider)
+      themeMode: ref.watch(settingsProvider).isDarkMode
           ? ThemeMode.dark
           : ThemeMode.light,
       debugShowCheckedModeBanner: false,
@@ -93,7 +94,7 @@ class _MainPageState extends ConsumerState<Main> {
   }
 
   int _currentIndex = 0;
-  Widget page = Bookmarks();
+  Widget page = Startup();
 
   final List<Widget> _pages = const [
     Bookmarks(),
@@ -132,36 +133,38 @@ class _MainPageState extends ConsumerState<Main> {
   Widget build(BuildContext context) {
     final color = _pageColors[_currentIndex];
     final icon = _pageIcons[_currentIndex];
-    AppBar? appBar;
-    if (page is HasPageTitle) {
-      final pageData = page as HasPageTitle;
-      appBar = AppBar(
-        backgroundColor: Colors.transparent,
-        title: Row(
-          children: [
-            Icon(icon, color: AppColors.white),
-            const SizedBox(width: 8),
-            Text(
-              pageData.pageTitle ?? "",
-              style: TextStyle(
-                color: AppColors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-      );
+    String? pageTitle;
+    bool hasNavBar = true;
+    if (page is PageSettings) {
+      final pageData = page as PageSettings;
+      pageTitle = pageData.pageTitle;
+      hasNavBar = !pageData.noNavBar;
     }
     return Scaffold(
-      appBar: appBar,
+      appBar: pageTitle != null ? AppBar(
+          backgroundColor: Colors.transparent,
+          title: Row(
+            children: [
+              Icon(icon, color: AppColors.white),
+              const SizedBox(width: 8),
+              Text(
+                pageTitle,
+                style: TextStyle(
+                  color: AppColors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ) : null,
       body: Padding(
-        padding: EdgeInsets.only(top: appBar == null ? 90.h : 0),
+        padding: EdgeInsets.only(top: pageTitle == null ? 90.h : 0),
         child: page,
       ),
-      backgroundColor: ref.watch(isDarkModeProvider)
+      backgroundColor: ref.watch(settingsProvider).isDarkMode
           ? AppColors.mainBackground(ref)
           : color,
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: hasNavBar ? BottomNavigationBar(
         currentIndex: _currentIndex,
         backgroundColor: AppColors.navBarPanel(ref),
         selectedItemColor: color,
@@ -194,11 +197,12 @@ class _MainPageState extends ConsumerState<Main> {
             label: 'Settings',
           ),
         ],
-      ),
+      ) : null,
     );
   }
 }
 
-abstract class HasPageTitle {
+abstract class PageSettings {
   String? get pageTitle;
+  bool get noNavBar => false;
 }

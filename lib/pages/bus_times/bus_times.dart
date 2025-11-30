@@ -271,7 +271,7 @@ class BTSearchResultPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = ref.watch(isDarkModeProvider);
+    final isDarkMode = ref.watch(settingsProvider).isDarkMode;
     return Column(
       children: [
         Center(

@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nyoom/main.dart';
 import 'package:nyoom/classes/colors.dart';
 
-class TravelRoutes extends ConsumerStatefulWidget implements HasPageTitle {
+class TravelRoutes extends ConsumerStatefulWidget implements PageSettings {
   const TravelRoutes({super.key});
 
   @override
@@ -12,6 +12,8 @@ class TravelRoutes extends ConsumerStatefulWidget implements HasPageTitle {
 
   @override
   String? get pageTitle => "Find a Route";
+  @override
+  bool get noNavBar => false;
 }
 
 class _BookmarksState extends ConsumerState<TravelRoutes> {

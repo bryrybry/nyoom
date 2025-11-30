@@ -14,7 +14,7 @@ import 'package:nyoom/pages/bus_times/arrival_time_display.dart';
 import 'package:nyoom/pages/bus_times/bookmark_star.dart';
 import 'package:nyoom/services/api_service.dart';
 
-class Bookmarks extends ConsumerStatefulWidget implements HasPageTitle {
+class Bookmarks extends ConsumerStatefulWidget implements PageSettings {
   const Bookmarks({super.key});
 
   @override
@@ -22,6 +22,8 @@ class Bookmarks extends ConsumerStatefulWidget implements HasPageTitle {
 
   @override
   String? get pageTitle => "Your Bookmarks";
+  @override
+  bool get noNavBar => false;
 }
 
 class _BookmarksState extends ConsumerState<Bookmarks> {
@@ -35,7 +37,6 @@ class _BookmarksState extends ConsumerState<Bookmarks> {
   }
 
   Future<void> init() async {
-    print("test123");
     importedBookmarks = ref.read(bookmarksProvider.notifier).getBookmarks();
     await initList();
     await refreshList();

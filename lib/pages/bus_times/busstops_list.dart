@@ -308,7 +308,7 @@ class _BusStopPanelState extends ConsumerState<BusStopPanel> {
                             busStopAT.roadName,
                             style: TextStyle(
                               fontSize: 48.sp,
-                              color: ref.watch(isDarkModeProvider)
+                              color: ref.watch(settingsProvider).isDarkMode
                                   ? AppColors.nyoomYellow(ref)
                                   : AppColors.nyoomDarkYellow,
                               fontWeight: FontWeight.w600,

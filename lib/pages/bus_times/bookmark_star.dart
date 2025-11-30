@@ -9,11 +9,7 @@ class BookmarkStar extends ConsumerStatefulWidget {
   final Bookmark bookmark;
   final VoidCallback? onTap;
 
-  const BookmarkStar({
-    super.key,
-    required this.bookmark,
-    this.onTap,
-  });
+  const BookmarkStar({super.key, required this.bookmark, this.onTap});
 
   @override
   ConsumerState<BookmarkStar> createState() => _BookmarkStarState();
@@ -45,12 +41,18 @@ class _BookmarkStarState extends ConsumerState<BookmarkStar> {
           isBookmarked = !isBookmarked;
         });
       },
-      child: Icon(
-        Icons.star,
-        size: 78.sp,
-        color: isBookmarked
-            ? AppColors.nyoomYellow(ref)
-            : AppColors.hintGray(ref),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Icon(Icons.star, size: 128.sp, color: AppColors.buttonPanel(ref)),
+          Icon(
+            Icons.star,
+            size: 78.sp,
+            color: isBookmarked
+                ? AppColors.nyoomYellow(ref)
+                : AppColors.hintGray(ref),
+          ),
+        ],
       ),
     );
   }
