@@ -141,22 +141,25 @@ class _MainPageState extends ConsumerState<Main> {
       hasNavBar = !pageData.noNavBar;
     }
     return Scaffold(
-      appBar: pageTitle != null ? AppBar(
-          backgroundColor: Colors.transparent,
-          title: Row(
-            children: [
-              Icon(icon, color: AppColors.white),
-              const SizedBox(width: 8),
-              Text(
-                pageTitle,
-                style: TextStyle(
-                  color: AppColors.white,
-                  fontWeight: FontWeight.w600,
-                ),
+      resizeToAvoidBottomInset: false,
+      appBar: pageTitle != null
+          ? AppBar(
+              backgroundColor: Colors.transparent,
+              title: Row(
+                children: [
+                  Icon(icon, color: AppColors.white),
+                  const SizedBox(width: 8),
+                  Text(
+                    pageTitle,
+                    style: TextStyle(
+                      color: AppColors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ) : null,
+            )
+          : null,
       body: Padding(
         padding: EdgeInsets.only(top: pageTitle == null ? 90.h : 0),
         child: page,
@@ -164,40 +167,42 @@ class _MainPageState extends ConsumerState<Main> {
       backgroundColor: ref.watch(settingsProvider).isDarkMode
           ? AppColors.mainBackground(ref)
           : color,
-      bottomNavigationBar: hasNavBar ? BottomNavigationBar(
-        currentIndex: _currentIndex,
-        backgroundColor: AppColors.navBarPanel(ref),
-        selectedItemColor: color,
-        iconSize: 90.h,
-        onTap: onNavBarTapped,
-        type: BottomNavigationBarType.fixed,
-        selectedLabelStyle: TextStyle(
-          fontSize: 45.sp,
-          fontWeight: FontWeight.w700,
-        ),
-        unselectedLabelStyle: TextStyle(
-          fontSize: 40.sp,
-          fontWeight: FontWeight.w600,
-        ),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bookmark),
-            label: 'Bookmarks',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.directions_bus),
-            label: 'Bus Times',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.location_pin),
-            label: 'Travel Routes',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-      ) : null,
+      bottomNavigationBar: hasNavBar
+          ? BottomNavigationBar(
+              currentIndex: _currentIndex,
+              backgroundColor: AppColors.navBarPanel(ref),
+              selectedItemColor: color,
+              iconSize: 90.h,
+              onTap: onNavBarTapped,
+              type: BottomNavigationBarType.fixed,
+              selectedLabelStyle: TextStyle(
+                fontSize: 45.sp,
+                fontWeight: FontWeight.w700,
+              ),
+              unselectedLabelStyle: TextStyle(
+                fontSize: 40.sp,
+                fontWeight: FontWeight.w600,
+              ),
+              items: const [
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.bookmark),
+                  label: 'Bookmarks',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.directions_bus),
+                  label: 'Bus Times',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.location_pin),
+                  label: 'Travel Routes',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.settings),
+                  label: 'Settings',
+                ),
+              ],
+            )
+          : null,
     );
   }
 }

@@ -15,7 +15,6 @@ class SettingsNotifier extends Notifier<AppSettings> {
     _box = Hive.box('settings');
     return AppSettings(
       isDarkMode: _box.get('isDarkMode', defaultValue: false),
-      isGuestMode: _box.get('isGuestMode', defaultValue: null),
     );
   }
 
@@ -23,10 +22,5 @@ class SettingsNotifier extends Notifier<AppSettings> {
     final newValue = !state.isDarkMode;
     state = state.copyWith(isDarkMode: newValue);
     _box.put('isDarkMode', newValue);
-  }
-
-  void setGuestMode(bool? value) {
-    state = state.copyWith(isGuestMode: value);
-    _box.put('isGuestMode', value);
   }
 }

@@ -79,6 +79,7 @@ class _BookmarksState extends ConsumerState<Settings> {
           // ignore: dead_code for now
           text: true ? 'Sign In' : 'Sign Out',
           onPressed: () {
+            ref.read(appDataProvider.notifier).setGuestMode(null);
             if (true) {
               ref.read(navigationProvider)?.call(Auth());
             // ignore: dead_code
