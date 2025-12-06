@@ -1,4 +1,5 @@
 import 'package:nyoom/classes/data_models/bus_arrival.dart';
+import 'package:nyoom/classes/helper.dart';
 import 'package:nyoom/services/dio.dart';
 
 class ApiService {
@@ -12,6 +13,9 @@ class ApiService {
     );
     final busArrival = await BusArrival.fromJson(response.data);
     if (busArrival.services.isEmpty) {
+      // if (await Helper.isWithinServiceHours(serviceNo, busStopCode)) {
+      //   return BusArrivalService.defaultBusArrivalService2();
+      // }
       return BusArrivalService.defaultBusArrivalService();
     }
     return busArrival.services.first;
@@ -53,6 +57,9 @@ class ApiService {
         final busArrival = await BusArrival.fromJson(response.data);
 
         if (busArrival.services.isEmpty) {
+          // if (await Helper.isWithinServiceHours(pair.value, pair.key)) {
+          //   return BusArrivalService.defaultBusArrivalService2();
+          // }
           return BusArrivalService.defaultBusArrivalService();
         }
 

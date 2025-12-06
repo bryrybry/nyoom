@@ -6,5 +6,4 @@
 - icons helper tooltip
 - store the path of buslist when sub-childing
 - test longest text for all ui
-- no buses avaialbe message (-3)
-- back button functions
+- no buses avaialbe message (-3) *is disabled cuz of lag

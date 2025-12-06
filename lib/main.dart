@@ -162,7 +162,40 @@ class _MainPageState extends ConsumerState<Main> {
           : null,
       body: Padding(
         padding: EdgeInsets.only(top: pageTitle == null ? 90.h : 0),
-        child: page,
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          transitionBuilder: (child, animation) {
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0.1, 0),
+                end: Offset.zero,
+              ).animate(animation),
+              child: FadeTransition(opacity: animation, child: child),
+            );
+          },
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                transitionBuilder: (child, animation) {
+                  return SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(0.1, 0),
+                      end: Offset.zero,
+                    ).animate(animation),
+                    child: FadeTransition(opacity: animation, child: child),
+                  );
+                },
+                child: SizedBox(
+                  key: ValueKey(page.runtimeType),
+                  width: constraints.maxWidth,
+                  height: constraints.maxHeight,
+                  child: page,
+                ),
+              );
+            },
+          ),
+        ),
       ),
       backgroundColor: ref.watch(settingsProvider).isDarkMode
           ? AppColors.mainBackground(ref)

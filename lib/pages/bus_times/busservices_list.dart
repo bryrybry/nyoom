@@ -16,8 +16,13 @@ import 'package:nyoom/services/api_service.dart';
 
 class BusServicesList extends ConsumerStatefulWidget {
   final BusStop busStop;
+  final List<BTSearchResult> searchHistoryList;
 
-  const BusServicesList({super.key, required this.busStop});
+  const BusServicesList({
+    super.key,
+    required this.busStop,
+    required this.searchHistoryList,
+  });
 
   @override
   ConsumerState<BusServicesList> createState() => _BusServicesListState();
@@ -135,6 +140,10 @@ class _BusServicesListState extends ConsumerState<BusServicesList> {
             refreshAT(services[index]);
           },
           bookmark: Bookmark.fromBusDataModels(busStop, services[index]),
+          searchHistoryList: [
+            ...widget.searchHistoryList,
+            BTSearchResult.fromBusStop(busStop),
+          ],
         );
       },
     );
@@ -145,12 +154,14 @@ class BusServicePanel extends ConsumerStatefulWidget {
   final BusServiceAT busServiceAT;
   final VoidCallback? onRefresh;
   final Bookmark bookmark;
+  final List<BTSearchResult> searchHistoryList;
 
   const BusServicePanel({
     super.key,
     required this.busServiceAT,
     required this.onRefresh,
     required this.bookmark,
+    required this.searchHistoryList,
   });
 
   @override
@@ -210,6 +221,7 @@ class _BusServicePanelState extends ConsumerState<BusServicePanel> {
                                 searchResult: BTSearchResult.fromBusService(
                                   busServiceAT,
                                 ),
+                                searchHistoryList: widget.searchHistoryList,
                               ),
                             );
                       },

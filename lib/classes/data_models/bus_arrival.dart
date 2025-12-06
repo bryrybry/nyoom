@@ -46,6 +46,15 @@ class BusArrivalService {
     );
   }
 
+  static BusArrivalService defaultBusArrivalService2() {
+    return BusArrivalService(
+      serviceNo: "",
+      nextBus: _BusTiming.defaultBusTiming2(),
+      nextBus2: _BusTiming.defaultBusTiming2(),
+      nextBus3: _BusTiming.defaultBusTiming2(),
+    );
+  }
+
   static Future<BusArrivalService> fromJson(Map<String, dynamic> json) async {
     Future<_BusTiming> parseBusTiming(dynamic data) async {
       if (data == null || data is! Map<String, dynamic>) {
@@ -92,6 +101,16 @@ class _BusTiming {
   static _BusTiming initBusTiming() {
     return _BusTiming(
       arrivalTime: -2,
+      isDoubleDecker: false,
+      isEstimatedTime: false,
+      isWheelchairAccessible: false,
+      load: "SEA",
+    );
+  }
+
+  static _BusTiming defaultBusTiming2() {
+    return _BusTiming(
+      arrivalTime: -3,
       isDoubleDecker: false,
       isEstimatedTime: false,
       isWheelchairAccessible: false,

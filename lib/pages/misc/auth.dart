@@ -155,7 +155,7 @@ class _AuthState extends ConsumerState<Auth> {
                                 : "Sign up",
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontSize: 42.sp,
+                              fontSize: 56.sp,
                               fontWeight: FontWeight.w800,
                               color: AppColors.nyoomYellow(ref),
                             ),

@@ -244,7 +244,12 @@ class _BookmarksState extends ConsumerState<BusTimes> {
                   onPressed: () {
                     ref
                         .read(navigationProvider)
-                        ?.call(BTList(searchResult: searchResult));
+                        ?.call(
+                          BTList(
+                            searchResult: searchResult,
+                            searchHistoryList: [],
+                          ),
+                        );
                   },
                   ref: ref,
                 );

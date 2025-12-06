@@ -36,4 +36,23 @@ class StaticData {
       ),
     );
   }
+
+  static Future<Map<String, Map<String, Map<String, String>>>>
+  firstLastBus() async {
+    final data = await Helper.readJSON('firstlastbus.json');
+
+    return (data as Map<String, dynamic>).map(
+      (key1, value1) => MapEntry(
+        key1,
+        (value1 as Map<String, dynamic>).map(
+          (key2, value2) => MapEntry(
+            key2,
+            (value2 as Map<String, dynamic>).map(
+              (key3, value3) => MapEntry(key3, value3 as String),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
