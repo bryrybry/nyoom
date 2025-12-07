@@ -72,7 +72,7 @@ class _BookmarksState extends ConsumerState<BusTimes> {
   }
 
   List<BTSearchResult> getBTSearchResultsCache() {
-    return ref.read(appDataProvider).btSearchResultsCache;
+    return List.from(ref.read(appDataProvider).btSearchResultsCache.reversed);
   }
 
   @override
@@ -242,6 +242,17 @@ class _BookmarksState extends ConsumerState<BusTimes> {
             ],
           ),
           // Search Results
+          if (getBTSearchResultsCache().isNotEmpty)
+            Text(
+              "————— Recent —————",
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 42.sp,
+                color: AppColors.hintGray(ref),
+                fontWeight: FontWeight.w500,
+                height: 0.5,
+              ),
+            ),
           Expanded(
             child: ListView(
               padding: EdgeInsets.zero,
@@ -260,7 +271,6 @@ class _BookmarksState extends ConsumerState<BusTimes> {
                             searchHistoryList: [],
                           ),
                         );
-                    print("added ${searchResult.header}");
                   },
                   ref: ref,
                 );

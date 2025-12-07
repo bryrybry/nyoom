@@ -24,21 +24,6 @@ class AppDataNotifier extends Notifier<AppData> {
     );
   }
 
-  @override
-  set state(AppData newState) {
-    final oldCache = super.state.btSearchResultsCache
-        .map((e) => e.header)
-        .toList();
-    super.state = newState;
-    final newCache = newState.btSearchResultsCache
-        .map((e) => e.header)
-        .toList();
-
-    if (oldCache.join(',') != newCache.join(',')) {
-      print("💥 Cache changed! Old: $oldCache → New: $newCache");
-    }
-  }
-
   void setGuestMode(bool? value) {
     state = state.copyWith(isGuestMode: value);
     _box.put('isGuestMode', value);
@@ -51,43 +36,22 @@ class AppDataNotifier extends Notifier<AppData> {
   }
 
   void addSearchResultCache(BTSearchResult btSearchResult) {
-    // Read existing cache from Hive
     List<BTSearchResult> btSearchResultsCache = List<BTSearchResult>.from(
       (_box.get('btSearchResultsCache', defaultValue: []) as List),
     );
-
-    print("=== Adding Search Result ===");
-    print(
-      "Current cache (${btSearchResultsCache.length} items): ${btSearchResultsCache.map((e) => e.header).toList()}",
-    );
-    print("Trying to add: ${btSearchResult.header}");
-
-    // Check for duplicates
-    if (!btSearchResultsCache.any((e) => e.header == btSearchResult.header)) {
-      btSearchResultsCache.add(btSearchResult);
-      print("Added: ${btSearchResult.header}");
-    } else {
-      print("Skipped adding duplicate: ${btSearchResult.header}");
+    if (btSearchResultsCache.any((e) => e.header == btSearchResult.header)) {
+      btSearchResultsCache.remove(btSearchResult);
     }
-
-    // Keep only the last 10 items
+    btSearchResultsCache.add(btSearchResult);
     while (btSearchResultsCache.length > 10) {
-      final removed = btSearchResultsCache.removeAt(0);
-      print("Removed oldest: ${removed.header}");
+      btSearchResultsCache.removeAt(0);
     }
-
-    // Update state and Hive
     state = state.copyWith(btSearchResultsCache: btSearchResultsCache);
     _box.put('btSearchResultsCache', btSearchResultsCache);
-
-    print(
-      "Updated cache (${btSearchResultsCache.length} items): ${btSearchResultsCache.map((e) => e.header).toList()}",
-    );
-    print("=== End Add ===\n");
   }
 
-  void clearSearchResultCache() {
-    state = state.copyWith(btSearchResultsCache: []); // update Riverpod state
-    _box.put('btSearchResultsCache', []); // update Hive
+  Future<void> clearSearchResultCache() async {
+    state = state.copyWith(btSearchResultsCache: []);
+    await _box.put('btSearchResultsCache', []);
   }
 }

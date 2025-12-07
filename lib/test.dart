@@ -7,13 +7,5 @@ import 'package:nyoom/providers/appdata_provider.dart';
 
 void testFunction(WidgetRef ref) async {
   final notifier = ref.read(appDataProvider.notifier);
-
-  print(notifier.state.btSearchResultsCache.map((e) => e.header));
-  print(notifier.state.btSearchResultsCache.length);
-
-  notifier.clearSearchResultCache();
-
-  // Read updated state
-  print(notifier.state.btSearchResultsCache.map((e) => e.header));
-  print(notifier.state.btSearchResultsCache.length);
+  await ref.read(appDataProvider.notifier).clearSearchResultCache();
 }
