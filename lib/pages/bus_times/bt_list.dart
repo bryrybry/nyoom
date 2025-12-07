@@ -5,7 +5,7 @@ import 'package:nyoom/app_state.dart';
 import 'package:nyoom/classes/colors.dart';
 import 'package:nyoom/classes/data_models/bus_service.dart';
 import 'package:nyoom/classes/data_models/bus_stop.dart';
-import 'package:nyoom/classes/data_models/bus_times_search_result.dart';
+import 'package:nyoom/classes/data_models/bt_search_result.dart';
 import 'package:nyoom/pages/bus_times/bus_times.dart';
 import 'package:nyoom/pages/bus_times/busservices_list.dart';
 import 'package:nyoom/pages/bus_times/busstops_list.dart';

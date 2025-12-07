@@ -1,11 +1,20 @@
+import 'package:hive/hive.dart';
 import 'package:nyoom/classes/data_models/bus_service.dart';
 import 'package:nyoom/classes/data_models/bus_stop.dart';
 
+part 'bt_search_result.g.dart';
+
+@HiveType(typeId: 2)
 class BTSearchResult {
+  @HiveField(0)
   final String type;
+  @HiveField(1)
   final String value;
+  @HiveField(2)
   final String header;
+  @HiveField(3)
   final String subheader1;
+  @HiveField(4)
   final String subheader2;
 
   BTSearchResult({

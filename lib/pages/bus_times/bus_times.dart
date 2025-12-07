@@ -5,7 +5,7 @@ import 'package:nyoom/app_state.dart';
 import 'package:nyoom/classes/colors.dart';
 import 'package:nyoom/classes/data_models/bus_service.dart';
 import 'package:nyoom/classes/data_models/bus_stop.dart';
-import 'package:nyoom/classes/data_models/bus_times_search_result.dart';
+import 'package:nyoom/classes/data_models/bt_search_result.dart';
 import 'package:nyoom/classes/static_data.dart';
 import 'package:nyoom/pages/bus_times/bt_list.dart';
 
@@ -28,6 +28,7 @@ class _BookmarksState extends ConsumerState<BusTimes> {
   @override
   void initState() {
     super.initState();
+    searchResults = getBTSearchResultsCache();
     loadData();
   }
 
@@ -64,8 +65,14 @@ class _BookmarksState extends ConsumerState<BusTimes> {
             }
           }
         }
+      } else {
+        searchResults = getBTSearchResultsCache();
       }
     });
+  }
+
+  List<BTSearchResult> getBTSearchResultsCache() {
+    return ref.read(appDataProvider).btSearchResultsCache;
   }
 
   @override
@@ -243,6 +250,9 @@ class _BookmarksState extends ConsumerState<BusTimes> {
                   searchResult: searchResult,
                   onPressed: () {
                     ref
+                        .read(appDataProvider.notifier)
+                        .addSearchResultCache(searchResult);
+                    ref
                         .read(navigationProvider)
                         ?.call(
                           BTList(
@@ -250,6 +260,7 @@ class _BookmarksState extends ConsumerState<BusTimes> {
                             searchHistoryList: [],
                           ),
                         );
+                    print("added ${searchResult.header}");
                   },
                   ref: ref,
                 );

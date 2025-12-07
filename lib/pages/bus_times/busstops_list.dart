@@ -8,7 +8,7 @@ import 'package:nyoom/classes/data_models/bookmark.dart';
 import 'package:nyoom/classes/data_models/bus_arrival.dart';
 import 'package:nyoom/classes/data_models/bus_service.dart';
 import 'package:nyoom/classes/data_models/bus_stop.dart';
-import 'package:nyoom/classes/data_models/bus_times_search_result.dart';
+import 'package:nyoom/classes/data_models/bt_search_result.dart';
 import 'package:nyoom/classes/static_data.dart';
 import 'package:nyoom/pages/bus_times/arrival_time_display.dart';
 import 'package:nyoom/pages/bus_times/bookmark_star.dart';

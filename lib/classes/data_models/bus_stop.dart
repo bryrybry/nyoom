@@ -1,5 +1,5 @@
 import 'package:nyoom/classes/data_models/bus_arrival.dart';
-import 'package:nyoom/classes/data_models/bus_times_search_result.dart';
+import 'package:nyoom/classes/data_models/bt_search_result.dart';
 
 class BusStop {
   final String busStopCode;
