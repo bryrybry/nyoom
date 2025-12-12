@@ -1,3 +1,4 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:nyoom/classes/data_models/bus_arrival.dart';
 // import 'package:nyoom/classes/helper.dart';
 import 'package:nyoom/services/dio.dart';
@@ -81,5 +82,15 @@ class ApiService {
     List<MapEntry<String, String>> pairs,
   ) async {
     return await Future.wait(pairs.map((p) => busArrival(p.key, p.value)));
+  }
+
+  static Future<void> sendTelegramFeedback(String feedbackContent) async {
+    await TelegramApiService.dio.get(
+      '/sendMessage',
+      queryParameters: {
+        'chat_id': dotenv.env['TELEGRAM_FEEDBACK_CHAT_ID'],
+        'text': feedbackContent,
+      },
+    );
   }
 }

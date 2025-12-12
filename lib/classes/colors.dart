@@ -56,7 +56,7 @@ class AppColors {
 
   static Color backgroundPanel(WidgetRef ref) {
     return ref.watch(settingsProvider).isDarkMode
-        ? const Color(0xFF1F2023)
+        ? const Color(0xFF212121)
         : const Color(0xFFDCDDE0);
   }
 
