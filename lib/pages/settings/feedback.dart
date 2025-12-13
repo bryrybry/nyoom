@@ -16,6 +16,8 @@ class NyoomFeedback extends ConsumerStatefulWidget {
 
 class _NyoomFeedbackState extends ConsumerState<NyoomFeedback> {
   String feedbackContent = "";
+  String errorMessage = "";
+  bool enableSubmit = false;
   @override
   void initState() {
     super.initState();
@@ -23,15 +25,39 @@ class _NyoomFeedbackState extends ConsumerState<NyoomFeedback> {
 
   void onFeedbackContentChanged(String value) {
     feedbackContent = value;
+    setState(() {
+      enableSubmit = feedbackContent.length > 1;
+    });
   }
 
-  void onSubmit() {
+  Future<void> onSubmit(context) async {
     String from = "Unknown User";
     if (ref.read(appDataProvider).isGuestMode == false) {
       from = ref.read(appDataProvider).email;
     }
-    ApiService.sendTelegramFeedback("From: $from\n\n$feedbackContent");
-    ref.read(navigationProvider)?.call(Settings());
+    APIServiceResult result = await ApiService.sendTelegramFeedback(
+      "From: $from\n\n$feedbackContent",
+    );
+    setState(() {
+      errorMessage = switch (result) {
+        APIServiceResult.noInternet => "Please check your internet connection.",
+        APIServiceResult.serverError =>
+          "Unable to submit. Please try again later.",
+        APIServiceResult.success => "",
+      };
+    });
+    if (errorMessage.isEmpty) {
+      ref.read(navigationProvider)?.call(Settings());
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Thanks for the feedback!',
+            style: TextStyle(color: AppColors.white),
+          ),
+          backgroundColor: AppColors.nyoomBlue,
+        ),
+      );
+    }
   }
 
   @override
@@ -119,9 +145,9 @@ class _NyoomFeedbackState extends ConsumerState<NyoomFeedback> {
                   ),
                 ),
                 SizedBox(height: 24.h),
-                if (false)
+                if (errorMessage.isNotEmpty)
                   Text(
-                    "",
+                    errorMessage,
                     style: TextStyle(
                       fontSize: 42.sp,
                       fontWeight: FontWeight.w600,
@@ -131,10 +157,17 @@ class _NyoomFeedbackState extends ConsumerState<NyoomFeedback> {
                 SizedBox(height: 24.h),
                 Center(
                   child: WideButton(
-                    color: AppColors.nyoomBlue,
-                    textColor: AppColors.white,
+                    color: enableSubmit
+                        ? AppColors.nyoomBlue
+                        : AppColors.darkGray(ref),
+                    textColor: AppColors.white.withAlpha(
+                      enableSubmit ? 255 : 63,
+                    ),
                     text: "Submit",
-                    onPressed: onSubmit,
+                    onPressed: () {
+                      if (!enableSubmit) return;
+                      onSubmit(context);
+                    },
                   ),
                 ),
               ],

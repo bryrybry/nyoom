@@ -1,7 +1,11 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:nyoom/classes/data_models/bus_arrival.dart';
 // import 'package:nyoom/classes/helper.dart';
 import 'package:nyoom/services/dio.dart';
+
+enum APIServiceResult { success, noInternet, serverError }
 
 class ApiService {
   static Future<BusArrivalService> busArrival(
@@ -84,13 +88,27 @@ class ApiService {
     return await Future.wait(pairs.map((p) => busArrival(p.key, p.value)));
   }
 
-  static Future<void> sendTelegramFeedback(String feedbackContent) async {
-    await TelegramApiService.dio.get(
-      '/sendMessage',
-      queryParameters: {
-        'chat_id': dotenv.env['TELEGRAM_FEEDBACK_CHAT_ID'],
-        'text': feedbackContent,
-      },
-    );
+  static Future<APIServiceResult> sendTelegramFeedback(String feedbackContent) async {
+    try {
+      await TelegramApiService.dio.get(
+        '/sendMessage',
+        queryParameters: {
+          'chat_id': dotenv.env['TELEGRAM_FEEDBACK_CHAT_ID'],
+          'text': feedbackContent,
+        },
+      );
+      return APIServiceResult.success;
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.connectionError ||
+          e.type == DioExceptionType.connectionTimeout) {
+        return APIServiceResult.noInternet;
+      }
+
+      if (e.response != null) {
+        debugPrint('Telegram error: ${e.response?.statusCode}');
+      }
+
+      return APIServiceResult.serverError;
+    }
   }
 }
