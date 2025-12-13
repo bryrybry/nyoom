@@ -270,11 +270,37 @@ class _BookmarkPanelState extends ConsumerState<BookmarkPanel> {
                                 GestureDetector(
                                   onTap: () {
                                     deletionTimer?.cancel();
-                                    ref
-                                        .read(bookmarksProvider.notifier)
-                                        .removeBookmark(bookmarkAT);
+                                    final bookmarksNotifier = ref.read(
+                                      bookmarksProvider.notifier,
+                                    );
+                                    final scaffoldMessenger =
+                                        ScaffoldMessenger.of(context);
+                                    bookmarksNotifier.removeBookmark(
+                                      bookmarkAT,
+                                    );
                                     widget.init!();
                                     deletionConfirmationMode = false;
+                                    scaffoldMessenger.showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          "Deleted ${bookmarkAT.busService} (${bookmarkAT.busStopName})",
+                                          style: const TextStyle(
+                                            color: AppColors.white,
+                                          ),
+                                        ),
+                                        backgroundColor: AppColors.nyoomBlue,
+                                        action: SnackBarAction(
+                                          label: "Undo",
+                                          textColor: AppColors.white,
+                                          onPressed: () {
+                                            bookmarksNotifier.addBookmark(
+                                              bookmarkAT,
+                                            );
+                                            widget.init!();
+                                          },
+                                        ),
+                                      ),
+                                    );
                                   },
                                   child: Material(
                                     elevation: 3,

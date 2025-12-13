@@ -12,18 +12,22 @@ class ApiService {
     String busStopCode,
     String serviceNo,
   ) async {
-    final response = await DatamallApiService.dio.get(
-      '/BusArrival',
-      queryParameters: {'BusStopCode': busStopCode, 'ServiceNo': serviceNo},
-    );
-    final busArrival = await BusArrival.fromJson(response.data);
-    if (busArrival.services.isEmpty) {
-      // if (await Helper.isWithinServiceHours(serviceNo, busStopCode)) {
-      //   return BusArrivalService.defaultBusArrivalService2();
-      // }
+    try {
+      final response = await DatamallApiService.dio.get(
+        '/BusArrival',
+        queryParameters: {'BusStopCode': busStopCode, 'ServiceNo': serviceNo},
+      );
+      final busArrival = await BusArrival.fromJson(response.data);
+      if (busArrival.services.isEmpty) {
+        // if (await Helper.isWithinServiceHours(serviceNo, busStopCode)) {
+        //   return BusArrivalService.defaultBusArrivalService2();
+        // }
+        return BusArrivalService.defaultBusArrivalService();
+      }
+      return busArrival.services.first;
+    } on DioException catch (_) {
       return BusArrivalService.defaultBusArrivalService();
     }
-    return busArrival.services.first;
   }
 
   static Future<List<BusArrivalService>> busArrivalMultiqueue({
@@ -88,7 +92,9 @@ class ApiService {
     return await Future.wait(pairs.map((p) => busArrival(p.key, p.value)));
   }
 
-  static Future<APIServiceResult> sendTelegramFeedback(String feedbackContent) async {
+  static Future<APIServiceResult> sendTelegramFeedback(
+    String feedbackContent,
+  ) async {
     try {
       await TelegramApiService.dio.get(
         '/sendMessage',
