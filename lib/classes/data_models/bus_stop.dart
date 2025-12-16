@@ -65,3 +65,9 @@ class BusStopAT extends BusStop {
     throw Error();
   }
 }
+
+class NearbyBusStop {
+  final double distance;
+  final BusStop busStop;
+  NearbyBusStop(this.distance, this.busStop);
+}

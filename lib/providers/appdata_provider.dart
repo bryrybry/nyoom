@@ -40,7 +40,9 @@ class AppDataNotifier extends Notifier<AppData> {
       (_box.get('btSearchResultsCache', defaultValue: []) as List),
     );
     if (btSearchResultsCache.any((e) => e.header == btSearchResult.header)) {
-      btSearchResultsCache.remove(btSearchResult);
+      btSearchResultsCache.removeWhere(
+        (e) => e.header == btSearchResult.header,
+      );
     }
     btSearchResultsCache.add(btSearchResult);
     while (btSearchResultsCache.length > 10) {
