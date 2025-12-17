@@ -10,6 +10,7 @@ import 'package:nyoom/classes/data_models/bt_search_result.dart';
 import 'package:nyoom/classes/helper.dart';
 import 'package:nyoom/classes/static_data.dart';
 import 'package:nyoom/pages/bus_times/bt_list.dart';
+import 'package:nyoom/pages/bus_times/bt_map.dart';
 
 class BusTimes extends ConsumerStatefulWidget {
   const BusTimes({super.key});
@@ -20,7 +21,9 @@ class BusTimes extends ConsumerStatefulWidget {
 
 enum FilterState { services, stops, nearby, normal }
 
-enum NearbyModeState { loading, failed, noFound, ready }
+enum NearbyModeState { loading, failed, ready }
+
+enum NearbyModeFailureType { unknown, connection, locationPerms, tooFar }
 
 class _BookmarksState extends ConsumerState<BusTimes> {
   FilterState filterState = FilterState.normal;
@@ -29,6 +32,7 @@ class _BookmarksState extends ConsumerState<BusTimes> {
   List<BTSearchResult> searchResults = [];
   String searchValue = "";
   NearbyModeState nearbyModeState = NearbyModeState.loading;
+  NearbyModeFailureType nearbyModeFailureType = NearbyModeFailureType.unknown;
   List<NearbyBusStop> nearestBusStopsCache = [];
 
   @override
@@ -89,47 +93,67 @@ class _BookmarksState extends ConsumerState<BusTimes> {
     if (nearestBusStopsCache.isNotEmpty) {
       nearestBusStops = List.from(nearestBusStopsCache);
     } else {
-      Position? position = await Helper().getLocation();
-      if (position == null || busStops.isEmpty) {
-        setState(() => nearbyModeState = NearbyModeState.failed);
-        return;
-      }
-      for (BusStop stop in busStops) {
-        if (stop.latitude == null || stop.longitude == null) continue;
-        double distance = Geolocator.distanceBetween(
-          position.latitude,
-          position.longitude,
-          stop.latitude!,
-          stop.longitude!,
-        );
-        if (distance <= 2500) {
-          if (nearestBusStops.isEmpty) {
-            nearestBusStops.add(NearbyBusStop(distance, stop));
-          } else {
-            if (distance < nearestBusStops.last.distance ||
-                nearestBusStops.length < nearbyStopsCount) {
-              int insertionIndex = nearestBusStops.indexWhere(
-                (s) => s.distance > distance,
-              );
-              if (insertionIndex == -1) {
-                nearestBusStops.add(NearbyBusStop(distance, stop));
-              } else {
-                nearestBusStops.insert(
-                  insertionIndex,
-                  NearbyBusStop(distance, stop),
+      try {
+        bool hasInternet = await Helper.hasInternet();
+        if (!hasInternet) {
+          setState(() {
+            nearbyModeState = NearbyModeState.failed;
+            nearbyModeFailureType = NearbyModeFailureType.connection;
+          });
+          return;
+        }
+        Position? position = await Helper.getLocation();
+        if (position == null || busStops.isEmpty) {
+          setState(() {
+            nearbyModeState = NearbyModeState.failed;
+            nearbyModeFailureType = NearbyModeFailureType.locationPerms;
+          });
+          return;
+        }
+        for (BusStop stop in busStops) {
+          if (stop.latitude == null || stop.longitude == null) continue;
+          double distance = Geolocator.distanceBetween(
+            position.latitude,
+            position.longitude,
+            stop.latitude!,
+            stop.longitude!,
+          );
+          if (distance <= 2500) {
+            if (nearestBusStops.isEmpty) {
+              nearestBusStops.add(NearbyBusStop(distance, stop));
+            } else {
+              if (distance < nearestBusStops.last.distance ||
+                  nearestBusStops.length < nearbyStopsCount) {
+                int insertionIndex = nearestBusStops.indexWhere(
+                  (s) => s.distance > distance,
                 );
-              }
-              if (nearestBusStops.length > nearbyStopsCount) {
-                nearestBusStops.removeLast();
+                if (insertionIndex == -1) {
+                  nearestBusStops.add(NearbyBusStop(distance, stop));
+                } else {
+                  nearestBusStops.insert(
+                    insertionIndex,
+                    NearbyBusStop(distance, stop),
+                  );
+                }
+                if (nearestBusStops.length > nearbyStopsCount) {
+                  nearestBusStops.removeLast();
+                }
               }
             }
           }
         }
+      } catch (e) {
+        setState(() {
+          nearbyModeState = NearbyModeState.failed;
+          nearbyModeFailureType = NearbyModeFailureType.unknown;
+        });
+        return;
       }
     }
     setState(() {
       if (nearestBusStops.isEmpty) {
         nearbyModeState = NearbyModeState.failed;
+        nearbyModeFailureType = NearbyModeFailureType.tooFar;
         return;
       }
       if (filterState != FilterState.nearby) return;
@@ -156,7 +180,9 @@ class _BookmarksState extends ConsumerState<BusTimes> {
             width: 1120.w,
             height: 180.h,
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                ref.read(navigationProvider)?.call(BTMap());
+              },
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(80.r),
@@ -171,7 +197,7 @@ class _BookmarksState extends ConsumerState<BusTimes> {
                   Icon(Icons.map, size: 84.sp, color: AppColors.primary(ref)),
                   SizedBox(width: 32.w),
                   Text(
-                    "View Map",
+                    "Bus Stops Map View",
                     style: TextStyle(
                       fontSize: 64.sp,
                       color: AppColors.primary(ref),
@@ -419,20 +445,32 @@ class _BookmarksState extends ConsumerState<BusTimes> {
                       );
                     }).toList(),
                   )
-                : nearbyModeState == NearbyModeState.loading
-                ? Center(
-                    child: CircularProgressIndicator(
-                      strokeWidth: 4,
-                      color: AppColors.hintGray(ref),
-                    ),
-                  )
-                : Text(switch (nearbyModeState) {
-                    NearbyModeState.loading || NearbyModeState.ready => "",
-                    NearbyModeState.failed =>
-                      "Could not find nearby bus stops.\nPlease enable location access.",
-                    NearbyModeState.noFound =>
-                      "Could not find nearby bus stops.\nAre you even in Singapore?",
-                  }),
+                : Center(
+                    child: nearbyModeState == NearbyModeState.loading
+                        ? CircularProgressIndicator(
+                            strokeWidth: 4,
+                            color: AppColors.hintGray(ref),
+                          )
+                        : Text(
+                          "Could not find nearby bus stops.\n${
+                            switch (nearbyModeFailureType) {
+                              NearbyModeFailureType.unknown =>
+                                "Please try again later.",
+                              NearbyModeFailureType.connection =>
+                                "Please check your internet connection.",
+                              NearbyModeFailureType.locationPerms =>
+                                "Please enable location access.",
+                              NearbyModeFailureType.tooFar =>
+                                "Are you even in Singapore?",
+                            }}",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 42.sp,
+                              color: AppColors.hintGray(ref),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                  ),
           ),
         ],
       ),

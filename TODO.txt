@@ -7,3 +7,4 @@
 - store the path of buslist when sub-childing
 - test longest text for all ui
 - no buses avaialbe message (-3) *is disabled cuz of lag
+- ios api key for google map, u can ctrl+f: "TODO_API_KEY"

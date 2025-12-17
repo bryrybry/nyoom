@@ -16,12 +16,12 @@ import 'package:nyoom/services/api_service.dart';
 
 class BusServicesList extends ConsumerStatefulWidget {
   final BusStop busStop;
-  final List<BTSearchResult> searchHistoryList;
+  final List<BTSearchResult>? searchHistoryList;
 
   const BusServicesList({
     super.key,
     required this.busStop,
-    required this.searchHistoryList,
+    this.searchHistoryList,
   });
 
   @override
@@ -140,10 +140,12 @@ class _BusServicesListState extends ConsumerState<BusServicesList> {
             refreshAT(services[index]);
           },
           bookmark: Bookmark.fromBusDataModels(busStop, services[index]),
-          searchHistoryList: [
-            ...widget.searchHistoryList,
-            BTSearchResult.fromBusStop(busStop),
-          ],
+          searchHistoryList: widget.searchHistoryList == null
+              ? null
+              : [
+                  ...widget.searchHistoryList!,
+                  BTSearchResult.fromBusStop(busStop),
+                ],
         );
       },
     );
@@ -154,14 +156,14 @@ class BusServicePanel extends ConsumerStatefulWidget {
   final BusServiceAT busServiceAT;
   final VoidCallback? onRefresh;
   final Bookmark bookmark;
-  final List<BTSearchResult> searchHistoryList;
+  final List<BTSearchResult>? searchHistoryList;
 
   const BusServicePanel({
     super.key,
     required this.busServiceAT,
     required this.onRefresh,
     required this.bookmark,
-    required this.searchHistoryList,
+    this.searchHistoryList,
   });
 
   @override
@@ -213,17 +215,19 @@ class _BusServicePanelState extends ConsumerState<BusServicePanel> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        ref
-                            .read(navigationProvider)
-                            ?.call(
-                              BTList(
-                                key: ValueKey(busServiceAT.busService),
-                                searchResult: BTSearchResult.fromBusService(
-                                  busServiceAT,
+                        if (widget.searchHistoryList != null) {
+                          ref
+                              .read(navigationProvider)
+                              ?.call(
+                                BTList(
+                                  key: ValueKey(busServiceAT.busService),
+                                  searchResult: BTSearchResult.fromBusService(
+                                    busServiceAT,
+                                  ),
+                                  searchHistoryList: widget.searchHistoryList!,
                                 ),
-                                searchHistoryList: widget.searchHistoryList,
-                              ),
-                            );
+                              );
+                        }
                       },
                       child: Text(
                         busServiceAT.busService,
