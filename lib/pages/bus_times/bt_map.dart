@@ -26,6 +26,7 @@ enum ArrivalTimeUIState { hideBar, showBar, showAT }
 class _BTMapState extends ConsumerState<BTMap> {
   late GoogleMapController _mapController;
   final Set<Marker> _markers = {};
+  late BitmapDescriptor busStopIcon;
   late LatLng _initialPosition;
   late List<BusStop> busStopsStaticData;
   LatLngBounds? _lastBounds;
@@ -45,6 +46,10 @@ class _BTMapState extends ConsumerState<BTMap> {
     setState(() => mapPreparationState = MapPreparationState.loading);
 
     try {
+      busStopIcon = await BitmapDescriptor.asset(
+        const ImageConfiguration(size: Size(48, 48)),
+        'assets/images/busstop_icon.png',
+      );
       bool hasInternet = await Helper.hasInternet();
       if (!hasInternet) {
         setState(() {
@@ -62,6 +67,15 @@ class _BTMapState extends ConsumerState<BTMap> {
         return;
       }
       _initialPosition = LatLng(position.latitude, position.longitude);
+      setState(() {
+        _markers.add(
+          Marker(
+            markerId: MarkerId("0"),
+            position: _initialPosition,
+            infoWindow: InfoWindow(title: "You are here"),
+          ),
+        );
+      });
       busStopsStaticData = await StaticData.busStops();
     } catch (e) {
       setState(() {
@@ -96,6 +110,7 @@ class _BTMapState extends ConsumerState<BTMap> {
             markerId: MarkerId(busStop.busStopCode),
             position: pos,
             infoWindow: InfoWindow(title: busStop.busStopName),
+            icon: busStopIcon,
             onTap: () {
               setState(() {
                 arrivalTimeUIState = ArrivalTimeUIState.showBar;

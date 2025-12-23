@@ -5,6 +5,7 @@ import 'package:nyoom/app_state.dart';
 import 'package:nyoom/classes/colors.dart';
 import 'package:nyoom/main.dart';
 import 'package:nyoom/pages/bookmarks/bookmarks.dart';
+import 'package:nyoom/services/firebase_service.dart';
 import 'package:nyoom/widgets/wide_button.dart';
 
 class Auth extends ConsumerStatefulWidget implements PageSettings {
@@ -24,10 +25,52 @@ enum AuthPageState { main, login, register }
 class _AuthState extends ConsumerState<Auth> {
   AuthPageState authPageState = AuthPageState.main;
 
+  final usernameController = TextEditingController(text: "bry");
+  final emailController = TextEditingController(text: "bryong0176@gmail.com");
+  final passwordController = TextEditingController(text: "01760176");
+
+  String errorMessage = "";
+
   @override
   void initState() {
     super.initState();
   }
+
+  @override
+  void dispose() {
+    usernameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> register() async {
+    if (passwordController.text.length < 6) {
+      setState(() {
+        errorMessage = "Password needs to be at least 6 characters.";
+      });
+      return;
+    }
+    RegisterUserResult result = await FirebaseService.registerUser(
+      username: usernameController.text,
+      email: emailController.text,
+      password: passwordController.text,
+    );
+    switch (result) {
+      case RegisterUserResult.authFailed:
+        setState(() {
+          errorMessage = "Auth failed. Please try again later.";
+        });
+      case RegisterUserResult.unknown:
+        setState(() {
+          errorMessage = "Unable to register. Please try again later.";
+        });
+      case RegisterUserResult.success:
+        ref.read(navigationProvider)?.call(Bookmarks());
+    }
+  }
+
+  Future<void> login() async {}
 
   @override
   Widget build(BuildContext context) {
@@ -102,11 +145,17 @@ class _AuthState extends ConsumerState<Auth> {
                   spacing: 60.h,
                   children: [
                     if (authPageState == AuthPageState.register)
-                      InputField(header: "username"),
-                    InputField(header: "email"),
-                    InputField(header: "password"),
+                      InputField(
+                        header: "username",
+                        controller: usernameController,
+                      ),
+                    InputField(header: "email", controller: emailController),
+                    InputField(
+                      header: "password",
+                      controller: passwordController,
+                    ),
                     Text(
-                      "",
+                      errorMessage,
                       style: TextStyle(
                         fontSize: 42.sp,
                         fontWeight: FontWeight.w600,
@@ -118,12 +167,14 @@ class _AuthState extends ConsumerState<Auth> {
                         color: AppColors.nyoomBlue,
                         textColor: AppColors.white,
                         text: (authPageState == AuthPageState.register)
-                            ? "Login"
-                            : "Register",
+                            ? "Register"
+                            : "Login",
                         onPressed: () {
-                          setState(() {
-                            authPageState = AuthPageState.login;
-                          });
+                          if (authPageState == AuthPageState.register) {
+                            register();
+                          } else {
+                            login();
+                          }
                         },
                       ),
                     ),
@@ -176,7 +227,8 @@ class _AuthState extends ConsumerState<Auth> {
 
 class InputField extends ConsumerWidget {
   final String header;
-  const InputField({super.key, required this.header});
+  final TextEditingController controller;
+  const InputField({super.key, required this.header, required this.controller});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -200,6 +252,8 @@ class InputField extends ConsumerWidget {
           ),
           SizedBox(height: 20.h),
           TextField(
+            controller: controller,
+            obscureText: header == "password",
             style: TextStyle(
               fontSize: 56.sp,
               fontWeight: FontWeight.w400,
