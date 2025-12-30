@@ -109,6 +109,19 @@ class _ArrivalTimeDisplayState extends ConsumerState<ArrivalTimeDisplay> {
                                 ),
                               ),
                             ),
+                          if (at1 == -3)
+                            Center(
+                              child: Text(
+                                "(No Estimate\nAvailable)",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: AppColors.errorRed,
+                                  fontSize: 72.sp,
+                                  height: 1.0,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
                         ]
                       : [
                           Row(

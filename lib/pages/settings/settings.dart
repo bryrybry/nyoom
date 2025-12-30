@@ -5,6 +5,7 @@ import 'package:nyoom/main.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nyoom/classes/colors.dart';
 import 'package:nyoom/pages/misc/auth.dart';
+import 'package:nyoom/pages/settings/feedback.dart';
 import 'package:nyoom/test.dart';
 import 'package:nyoom/widgets/circle_button.dart';
 import 'package:nyoom/widgets/wide_button.dart';
@@ -52,7 +53,9 @@ class _BookmarksState extends ConsumerState<Settings> {
               text: "Feedback",
               icon: Icons.feedback,
               ref: ref,
-              onPressed: () {},
+              onPressed: () {
+                ref.read(navigationProvider)?.call(NyoomFeedback());
+              },
             ),
           ],
         ),
@@ -79,6 +82,7 @@ class _BookmarksState extends ConsumerState<Settings> {
           // ignore: dead_code for now
           text: true ? 'Sign In' : 'Sign Out',
           onPressed: () {
+            ref.read(appDataProvider.notifier).setGuestMode(null);
             if (true) {
               ref.read(navigationProvider)?.call(Auth());
             // ignore: dead_code

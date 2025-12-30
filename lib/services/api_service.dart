@@ -1,20 +1,33 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:nyoom/classes/data_models/bus_arrival.dart';
+// import 'package:nyoom/classes/helper.dart';
 import 'package:nyoom/services/dio.dart';
+
+enum APIServiceResult { success, noInternet, serverError }
 
 class ApiService {
   static Future<BusArrivalService> busArrival(
     String busStopCode,
     String serviceNo,
   ) async {
-    final response = await DatamallApiService.dio.get(
-      '/BusArrival',
-      queryParameters: {'BusStopCode': busStopCode, 'ServiceNo': serviceNo},
-    );
-    final busArrival = await BusArrival.fromJson(response.data);
-    if (busArrival.services.isEmpty) {
+    try {
+      final response = await DatamallApiService.dio.get(
+        '/BusArrival',
+        queryParameters: {'BusStopCode': busStopCode, 'ServiceNo': serviceNo},
+      );
+      final busArrival = await BusArrival.fromJson(response.data);
+      if (busArrival.services.isEmpty) {
+        // if (await Helper.isWithinServiceHours(serviceNo, busStopCode)) {
+        //   return BusArrivalService.defaultBusArrivalService2();
+        // }
+        return BusArrivalService.defaultBusArrivalService();
+      }
+      return busArrival.services.first;
+    } on DioException catch (_) {
       return BusArrivalService.defaultBusArrivalService();
     }
-    return busArrival.services.first;
   }
 
   static Future<List<BusArrivalService>> busArrivalMultiqueue({
@@ -53,6 +66,9 @@ class ApiService {
         final busArrival = await BusArrival.fromJson(response.data);
 
         if (busArrival.services.isEmpty) {
+          // if (await Helper.isWithinServiceHours(pair.value, pair.key)) {
+          //   return BusArrivalService.defaultBusArrivalService2();
+          // }
           return BusArrivalService.defaultBusArrivalService();
         }
 
@@ -74,5 +90,31 @@ class ApiService {
     List<MapEntry<String, String>> pairs,
   ) async {
     return await Future.wait(pairs.map((p) => busArrival(p.key, p.value)));
+  }
+
+  static Future<APIServiceResult> sendTelegramFeedback(
+    String feedbackContent,
+  ) async {
+    try {
+      await TelegramApiService.dio.get(
+        '/sendMessage',
+        queryParameters: {
+          'chat_id': dotenv.env['TELEGRAM_FEEDBACK_CHAT_ID'],
+          'text': feedbackContent,
+        },
+      );
+      return APIServiceResult.success;
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.connectionError ||
+          e.type == DioExceptionType.connectionTimeout) {
+        return APIServiceResult.noInternet;
+      }
+
+      if (e.response != null) {
+        debugPrint('Telegram error: ${e.response?.statusCode}');
+      }
+
+      return APIServiceResult.serverError;
+    }
   }
 }

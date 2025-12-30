@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   await dotenv.load(fileName: ".env");
   await initHive();
   runApp(
@@ -141,63 +143,101 @@ class _MainPageState extends ConsumerState<Main> {
       hasNavBar = !pageData.noNavBar;
     }
     return Scaffold(
-      appBar: pageTitle != null ? AppBar(
-          backgroundColor: Colors.transparent,
-          title: Row(
-            children: [
-              Icon(icon, color: AppColors.white),
-              const SizedBox(width: 8),
-              Text(
-                pageTitle,
-                style: TextStyle(
-                  color: AppColors.white,
-                  fontWeight: FontWeight.w600,
-                ),
+      resizeToAvoidBottomInset: false,
+      appBar: pageTitle != null
+          ? AppBar(
+              backgroundColor: Colors.transparent,
+              title: Row(
+                children: [
+                  Icon(icon, color: AppColors.white),
+                  const SizedBox(width: 8),
+                  Text(
+                    pageTitle,
+                    style: TextStyle(
+                      color: AppColors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ) : null,
+            )
+          : null,
       body: Padding(
         padding: EdgeInsets.only(top: pageTitle == null ? 90.h : 0),
-        child: page,
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          transitionBuilder: (child, animation) {
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0.1, 0),
+                end: Offset.zero,
+              ).animate(animation),
+              child: FadeTransition(opacity: animation, child: child),
+            );
+          },
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                transitionBuilder: (child, animation) {
+                  return SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(0.1, 0),
+                      end: Offset.zero,
+                    ).animate(animation),
+                    child: FadeTransition(opacity: animation, child: child),
+                  );
+                },
+                child: SizedBox(
+                  key: ValueKey(page.runtimeType),
+                  width: constraints.maxWidth,
+                  height: constraints.maxHeight,
+                  child: page,
+                ),
+              );
+            },
+          ),
+        ),
       ),
       backgroundColor: ref.watch(settingsProvider).isDarkMode
           ? AppColors.mainBackground(ref)
           : color,
-      bottomNavigationBar: hasNavBar ? BottomNavigationBar(
-        currentIndex: _currentIndex,
-        backgroundColor: AppColors.navBarPanel(ref),
-        selectedItemColor: color,
-        iconSize: 90.h,
-        onTap: onNavBarTapped,
-        type: BottomNavigationBarType.fixed,
-        selectedLabelStyle: TextStyle(
-          fontSize: 45.sp,
-          fontWeight: FontWeight.w700,
-        ),
-        unselectedLabelStyle: TextStyle(
-          fontSize: 40.sp,
-          fontWeight: FontWeight.w600,
-        ),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bookmark),
-            label: 'Bookmarks',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.directions_bus),
-            label: 'Bus Times',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.location_pin),
-            label: 'Travel Routes',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-      ) : null,
+      bottomNavigationBar: hasNavBar
+          ? BottomNavigationBar(
+              currentIndex: _currentIndex,
+              backgroundColor: AppColors.navBarPanel(ref),
+              selectedItemColor: color,
+              iconSize: 90.h,
+              onTap: onNavBarTapped,
+              type: BottomNavigationBarType.fixed,
+              selectedLabelStyle: TextStyle(
+                fontSize: 45.sp,
+                fontWeight: FontWeight.w700,
+              ),
+              unselectedLabelStyle: TextStyle(
+                fontSize: 40.sp,
+                fontWeight: FontWeight.w600,
+              ),
+              items: const [
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.bookmark),
+                  label: 'Bookmarks',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.directions_bus),
+                  label: 'Bus Times',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.location_pin),
+                  label: 'Travel Routes',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.settings),
+                  label: 'Settings',
+                ),
+              ],
+            )
+          : null,
     );
   }
 }

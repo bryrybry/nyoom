@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "235644167418",
+    "project_id": "nyoomtravelsite",
+    "storage_bucket": "nyoomtravelsite.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:235644167418:android:a5bc6599e7dca7683fd543",
+        "android_client_info": {
+          "package_name": "com.example.madproject"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAqzT-sOxeYCeoFRRpQkcp7xt20L3ZRKUA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

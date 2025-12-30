@@ -19,6 +19,11 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   hive_generator: ^2.0.1
+  geolocator: ^14.0.2
+  google_maps_flutter: ^2.14.0
+  firebase_auth: ^6.1.3
+  cloud_firestore: ^6.1.1
+  firebase_core: ^4.3.0
 
 dev_dependencies:
   flutter_test:

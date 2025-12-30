@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nyoom/app_state.dart';
 import 'package:nyoom/classes/colors.dart';
 import 'package:nyoom/main.dart';
 import 'package:nyoom/pages/bookmarks/bookmarks.dart';
-import 'package:nyoom/providers/navigation_provider.dart';
+import 'package:nyoom/pages/misc/auth.dart';
 
 class Startup extends ConsumerStatefulWidget implements PageSettings {
   const Startup({super.key});
@@ -28,7 +29,10 @@ class _StartupState extends ConsumerState<Startup> {
 
   Future<void> init() async {
     await Future.delayed(const Duration(milliseconds: 500));
-    ref.read(navigationProvider)?.call(Bookmarks());
+    bool? isGuestMode = ref.read(appDataProvider).isGuestMode;
+    ref
+        .read(navigationProvider)
+        ?.call((isGuestMode == null) ? Auth() : Bookmarks());
   }
 
   @override
