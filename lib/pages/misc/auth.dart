@@ -70,7 +70,30 @@ class _AuthState extends ConsumerState<Auth> {
     }
   }
 
-  Future<void> login() async {}
+  Future<void> login() async {
+        LoginUserResult result = await FirebaseService.loginUser(
+      email: emailController.text,
+      password: passwordController.text,
+    );switch (result) {
+      case LoginUserResult.success:
+        ref.read(navigationProvider)?.call(Bookmarks());
+      case LoginUserResult.noUser:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case LoginUserResult.invalidEmail:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case LoginUserResult.emailNotFound:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case LoginUserResult.wrongPassword:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case LoginUserResult.unknown:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +109,7 @@ class _AuthState extends ConsumerState<Auth> {
           ),
         ),
         child: Stack(
-          children: [
+          children: [x
             // Always visible
             Positioned(
               left: 0,
