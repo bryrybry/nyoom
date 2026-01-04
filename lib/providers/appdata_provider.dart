@@ -15,24 +15,11 @@ class AppDataNotifier extends Notifier<AppData> {
   AppData build() {
     _box = Hive.box('appdata');
     return AppData(
-      username: _box.get('username', defaultValue: ""),
       email: _box.get('email', defaultValue: ""),
-      isGuestMode: _box.get('isGuestMode', defaultValue: null),
       btSearchResultsCache:
           (_box.get('btSearchResultsCache', defaultValue: []) as List)
               .cast<BTSearchResult>(),
     );
-  }
-
-  void setGuestMode(bool? value) {
-    state = state.copyWith(isGuestMode: value);
-    _box.put('isGuestMode', value);
-  }
-
-  void setUsernameEmail(String username, String email) {
-    state = state.copyWith(username: username, email: email);
-    _box.put('username', username);
-    _box.put('email', email);
   }
 
   void addSearchResultCache(BTSearchResult btSearchResult) {

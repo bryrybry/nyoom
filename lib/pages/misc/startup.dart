@@ -4,7 +4,6 @@ import 'package:nyoom/app_state.dart';
 import 'package:nyoom/classes/colors.dart';
 import 'package:nyoom/main.dart';
 import 'package:nyoom/pages/bookmarks/bookmarks.dart';
-import 'package:nyoom/pages/misc/auth.dart';
 
 class Startup extends ConsumerStatefulWidget implements PageSettings {
   const Startup({super.key});
@@ -29,10 +28,9 @@ class _StartupState extends ConsumerState<Startup> {
 
   Future<void> init() async {
     await Future.delayed(const Duration(milliseconds: 500));
-    bool? isGuestMode = ref.read(appDataProvider).isGuestMode;
     ref
         .read(navigationProvider)
-        ?.call((isGuestMode == null) ? Auth() : Bookmarks());
+        ?.call(Bookmarks());
   }
 
   @override

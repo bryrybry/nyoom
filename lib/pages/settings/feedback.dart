@@ -32,9 +32,6 @@ class _NyoomFeedbackState extends ConsumerState<NyoomFeedback> {
 
   Future<void> onSubmit(context) async {
     String from = "Unknown User";
-    if (ref.read(appDataProvider).isGuestMode == false) {
-      from = ref.read(appDataProvider).email;
-    }
     APIServiceResult result = await ApiService.sendTelegramFeedback(
       "From: $from\n\n$feedbackContent",
     );
