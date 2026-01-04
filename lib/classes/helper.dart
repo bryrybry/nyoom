@@ -129,4 +129,8 @@ class Helper {
     }
     return await Geolocator.getCurrentPosition();
   }
+
+  static bool isValidEmail(String email) {
+    return RegExp(r'^[\w\.-]+@([\w-]+\.)+[\w-]{2,}$').hasMatch(email);
+  }
 }

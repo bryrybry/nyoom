@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nyoom/app_state.dart';
 import 'package:nyoom/classes/colors.dart';
+import 'package:nyoom/classes/helper.dart';
 import 'package:nyoom/pages/settings/settings.dart';
 import 'package:nyoom/services/api_service.dart';
 import 'package:nyoom/widgets/wide_button.dart';
@@ -15,25 +16,57 @@ class NyoomFeedback extends ConsumerStatefulWidget {
 }
 
 class _NyoomFeedbackState extends ConsumerState<NyoomFeedback> {
-  String feedbackContent = "";
   String errorMessage = "";
   bool enableSubmit = false;
+  bool autofillEmail = false;
+  late final TextEditingController emailController;
+  late final TextEditingController feedbackController;
+
   @override
   void initState() {
     super.initState();
+    String email = ref.read(appDataProvider).email;
+    if (email.isNotEmpty) {
+      autofillEmail = true;
+    }
+    emailController = TextEditingController(text: email);
+    feedbackController = TextEditingController();
   }
 
-  void onFeedbackContentChanged(String value) {
-    feedbackContent = value;
+  @override
+  void dispose() {
+    emailController.dispose();
+    feedbackController.dispose();
+    super.dispose();
+  }
+
+  void onTextFieldChanged(_) {
     setState(() {
-      enableSubmit = feedbackContent.length > 1;
+      enableSubmit =
+          emailController.text.trim().isNotEmpty &&
+          feedbackController.text.trim().isNotEmpty;
+    });
+  }
+
+  void clearEmail() {
+    emailController.clear();
+    ref.read(appDataProvider.notifier).setEmail("");
+    setState(() {
+      autofillEmail = false;
+      enableSubmit = false;
     });
   }
 
   Future<void> onSubmit(context) async {
-    String from = "Unknown User";
+    final email = emailController.text.trim();
+    final feedback = feedbackController.text.trim();
+
+    if (!Helper.isValidEmail(email)) {
+      setState(() => errorMessage = "Invalid email address.");
+      return;
+    }
     APIServiceResult result = await ApiService.sendTelegramFeedback(
-      "From: $from\n\n$feedbackContent",
+      "From: $email\n$feedback",
     );
     setState(() {
       errorMessage = switch (result) {
@@ -45,6 +78,7 @@ class _NyoomFeedbackState extends ConsumerState<NyoomFeedback> {
     });
     if (errorMessage.isEmpty) {
       ref.read(navigationProvider)?.call(Settings());
+      ref.read(appDataProvider.notifier).setEmail(email);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
@@ -121,8 +155,41 @@ class _NyoomFeedbackState extends ConsumerState<NyoomFeedback> {
                 SizedBox(
                   width: 1120.w,
                   child: TextField(
-                    onChanged: onFeedbackContentChanged,
-                    maxLines: 10,
+                    controller: emailController,
+                    onChanged: onTextFieldChanged,
+                    maxLines: 1,
+                    keyboardType: TextInputType.multiline,
+                    style: TextStyle(
+                      fontSize: 56.sp,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.primary(ref),
+                    ),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: AppColors.backgroundPanel(ref),
+                      hintText: "Your email...",
+                      hintStyle: TextStyle(fontSize: 56.sp),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(60.r),
+                      ),
+                      prefixIcon: Icon(Icons.email),
+                      suffixIcon: emailController.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.close),
+                              iconSize: 96.sp,
+                              onPressed: clearEmail,
+                            )
+                          : null,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 12.h),
+                SizedBox(
+                  width: 1120.w,
+                  child: TextField(
+                    controller: feedbackController,
+                    onChanged: onTextFieldChanged,
+                    maxLines: 8,
                     keyboardType: TextInputType.multiline,
                     style: TextStyle(
                       fontSize: 56.sp,

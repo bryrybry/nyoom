@@ -22,6 +22,11 @@ class AppDataNotifier extends Notifier<AppData> {
     );
   }
 
+  void setEmail(String email) {
+    state = state.copyWith(email: email);
+    _box.put('email', email);
+  }
+
   void addSearchResultCache(BTSearchResult btSearchResult) {
     List<BTSearchResult> btSearchResultsCache = List<BTSearchResult>.from(
       (_box.get('btSearchResultsCache', defaultValue: []) as List),
