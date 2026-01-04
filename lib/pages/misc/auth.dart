@@ -75,23 +75,28 @@ class _AuthState extends ConsumerState<Auth> {
       email: emailController.text,
       password: passwordController.text,
     );switch (result) {
+      case LoginUserResult.noUser:
+        setState(() {
+          errorMessage = "Auth failed. Please try again later.";
+        });
+      case LoginUserResult.invalidEmail:
+        setState(() {
+          errorMessage = "Auth failed. Please try again later.";
+        });
+      case LoginUserResult.emailNotFound:
+        setState(() {
+          errorMessage = "Auth failed. Please try again later.";
+        });
+      case LoginUserResult.wrongPassword:
+        setState(() {
+          errorMessage = "Auth failed. Please try again later.";
+        });
+      case LoginUserResult.unknown:
+        setState(() {
+          errorMessage = "Unable to login. Please try again later.";
+        });
       case LoginUserResult.success:
         ref.read(navigationProvider)?.call(Bookmarks());
-      case LoginUserResult.noUser:
-        // TODO: Handle this case.
-        throw UnimplementedError();
-      case LoginUserResult.invalidEmail:
-        // TODO: Handle this case.
-        throw UnimplementedError();
-      case LoginUserResult.emailNotFound:
-        // TODO: Handle this case.
-        throw UnimplementedError();
-      case LoginUserResult.wrongPassword:
-        // TODO: Handle this case.
-        throw UnimplementedError();
-      case LoginUserResult.unknown:
-        // TODO: Handle this case.
-        throw UnimplementedError();
     }
   }
 
