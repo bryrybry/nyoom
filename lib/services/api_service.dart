@@ -1,7 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nyoom/app_state.dart';
 import 'package:nyoom/classes/data_models/bus_arrival.dart';
+import 'package:nyoom/classes/data_models/onemap_search_result.dart';
 // import 'package:nyoom/classes/helper.dart';
 import 'package:nyoom/services/dio.dart';
 
@@ -75,9 +78,11 @@ class ApiService {
         return busArrival.services.first;
       } catch (e) {
         // Log and return fallback instead of crashing
-        print(
-          "Failed bus arrival request for stop ${pair.key}, service ${pair.value}: $e",
-        );
+        if (kDebugMode) {
+          print(
+            "Failed bus arrival request for stop ${pair.key}, service ${pair.value}: $e",
+          );
+        }
 
         return BusArrivalService.defaultBusArrivalService();
       }
@@ -111,10 +116,69 @@ class ApiService {
       }
 
       if (e.response != null) {
-        debugPrint('Telegram error: ${e.response?.statusCode}');
+        if (kDebugMode) {
+          print('Telegram error: ${e.response?.statusCode}');
+        }
       }
 
       return APIServiceResult.serverError;
+    }
+  }
+
+  static Future<Map<String, dynamic>> getNewOnemapAccessToken() async {
+    try {
+      final response = await OnemapApiService.dio.post(
+        '/auth/post/getToken',
+        data: {
+          "email": dotenv.env['ONEMAP_EMAIL'],
+          "password": dotenv.env['ONEMAP_PASSWORD'],
+        },
+      );
+      return Map<String, dynamic>.from(response.data);
+    } on DioException catch (e) {
+      if (e.response != null) {
+        if (kDebugMode) {
+          print('Onemap auth error: ${e.response?.statusCode}');
+        }
+      }
+
+      return {};
+    }
+  }
+
+  static Future<List<OnemapSearchResult>> onemapSearch(
+    WidgetRef ref,
+    String searchValue,
+  ) async {
+    try {
+      final response = await OnemapApiService.dio.get(
+        '/common/elastic/search',
+        options: Options(
+          headers: {
+            "Authorization": await ref
+                .read(appDataProvider.notifier)
+                .getOnemapAccessToken(),
+          },
+        ),
+        queryParameters: {
+          'searchVal': searchValue,
+          'returnGeom': 'Y',
+          'getAddrDetails': 'Y',
+        },
+      );
+      return (response.data["results"] as List)
+          .map(
+            (item) => OnemapSearchResult.fromJson(item as Map<String, dynamic>),
+          )
+          .toList();
+    } on DioException catch (e) {
+      if (e.response != null) {
+        if (kDebugMode) {
+          print('Onemap search error: ${e.response?.statusCode}');
+        }
+      }
+
+      return [];
     }
   }
 }

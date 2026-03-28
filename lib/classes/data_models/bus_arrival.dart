@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:ntp/ntp.dart';
+import 'package:nyoom/classes/helper.dart';
 
 class BusArrival {
   final List<BusArrivalService> services;
@@ -37,7 +37,7 @@ class BusArrivalService {
     );
   }
 
-    static BusArrivalService initBusArrivalService() {
+  static BusArrivalService initBusArrivalService() {
     return BusArrivalService(
       serviceNo: "",
       nextBus: _BusTiming.initBusTiming(),
@@ -97,7 +97,7 @@ class _BusTiming {
       load: "SEA",
     );
   }
-  
+
   static _BusTiming initBusTiming() {
     return _BusTiming(
       arrivalTime: -2,
@@ -144,12 +144,7 @@ class _BusTiming {
       return -1;
     }
 
-    late DateTime now;
-    try {
-      now = (await NTP.now()).toUtc().add(Duration(hours: 8));
-    } catch (e) {
-      now = DateTime.now().toUtc().add(Duration(hours: 8));
-    }
+    DateTime now = await Helper.timeNow();
 
     final diff = target.difference(now);
     return diff.inMinutes;

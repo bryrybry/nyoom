@@ -8,20 +8,13 @@ import 'package:nyoom/classes/data_models/bus_stop.dart';
 import 'package:nyoom/classes/helper.dart';
 import 'package:nyoom/classes/static_data.dart';
 import 'package:nyoom/providers/appdata_provider.dart';
+import 'package:nyoom/services/api_service.dart';
 
 void testFunction(WidgetRef ref) async {
-  await _getApiKey();
-}
-
-Future<void> _getApiKey() async {
-  try {
-    final key = await const MethodChannel(
-      'flutter/key_test',
-    ).invokeMethod<String>('getGoogleMapsApiKey');
-    print(
-      'Google Maps API Key: ${key ?? 'Not found'}',
-    ); // Will print in debug console
-  } on PlatformException catch (e) {
-    print('Error fetching API key: $e');
-  }
+  print(
+    (await ApiService.onemapSearch(
+      ref,
+      "singapore polytechnic",
+    )).map((e) => e.searchVal).toList(),
+  );
 }

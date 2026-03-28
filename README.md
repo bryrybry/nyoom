@@ -35,8 +35,4 @@ A quick and easy Flutter app that makes travelling around Singapore easier.
 - [ourhound](https://ourhound.com/transportations-tips-travelling-around-Singapore) (Icons & Images) 
 - [cheeaun/sgraildata](https://github.com/cheeaun/sgraildata) (Datasets Used)
 
-
-
 ---
-
-

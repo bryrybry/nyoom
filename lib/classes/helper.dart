@@ -40,6 +40,21 @@ class Helper {
     return '${text.substring(0, split).trim()}\n${text.substring(split).trim()}';
   }
 
+  static Future<DateTime> timeNow() async {
+    late DateTime now;
+    try {
+      now = (await NTP.now()).toUtc().add(Duration(hours: 8));
+    } catch (e) {
+      now = DateTime.now().toUtc().add(Duration(hours: 8));
+    }
+    return now;
+  }
+
+  static Future<int> timeNowEpoch() async {
+    DateTime dateTimeNow = await timeNow();
+    return dateTimeNow.toUtc().millisecondsSinceEpoch ~/ 1000;
+  }
+
   static Future<bool> isWithinServiceHours(
     String busService,
     String busStopCode,
@@ -49,12 +64,7 @@ class Helper {
     Map<String, String> serviceHours = firstLastBus[busService]![busStopCode]!;
 
     // Get SG time
-    late DateTime now;
-    try {
-      now = (await NTP.now()).toUtc().add(Duration(hours: 8));
-    } catch (e) {
-      now = DateTime.now().toUtc().add(Duration(hours: 8));
-    }
+    DateTime now = await timeNow();
 
     // Determine day key: WD / SAT / SUN
     String dayKey;

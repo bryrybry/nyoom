@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:nyoom/app_state.dart';
 import 'package:nyoom/main.dart';
 import 'package:nyoom/classes/colors.dart';
+import 'package:nyoom/pages/travel_routes/tr_search.dart';
 
 class TravelRoutes extends ConsumerStatefulWidget implements PageSettings {
   const TravelRoutes({super.key});
 
   @override
-  ConsumerState<TravelRoutes> createState() => _BookmarksState();
+  ConsumerState<TravelRoutes> createState() => _TravelRoutesState();
 
   @override
   String? get pageTitle => "Find a Route";
@@ -16,7 +18,9 @@ class TravelRoutes extends ConsumerStatefulWidget implements PageSettings {
   bool get noNavBar => false;
 }
 
-class _BookmarksState extends ConsumerState<TravelRoutes> {
+class _TravelRoutesState extends ConsumerState<TravelRoutes> {
+  static const String searchBarHint1 = "From...";
+  static const String searchBarHint2 = "To where?";
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -27,7 +31,11 @@ class _BookmarksState extends ConsumerState<TravelRoutes> {
             width: 1120.w,
             height: 180.h,
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                ref
+                    .read(navigationProvider)
+                    ?.call(TRSearch(searchBarHint: searchBarHint1));
+              },
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(60.r),
@@ -46,7 +54,7 @@ class _BookmarksState extends ConsumerState<TravelRoutes> {
                   ),
                   SizedBox(width: 32.w),
                   Text(
-                    "From...",
+                    searchBarHint1,
                     style: TextStyle(
                       fontSize: 56.sp,
                       fontWeight: FontWeight.w400,
@@ -61,7 +69,11 @@ class _BookmarksState extends ConsumerState<TravelRoutes> {
             width: 1120.w,
             height: 180.h,
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                ref
+                    .read(navigationProvider)
+                    ?.call(TRSearch(searchBarHint: searchBarHint2));
+              },
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(60.r),
@@ -80,7 +92,7 @@ class _BookmarksState extends ConsumerState<TravelRoutes> {
                   ),
                   SizedBox(width: 32.w),
                   Text(
-                    "To where?",
+                    searchBarHint2,
                     style: TextStyle(
                       fontSize: 56.sp,
                       fontWeight: FontWeight.w400,
