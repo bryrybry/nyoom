@@ -2,7 +2,7 @@
 
 ![nyoom](./assets/images/nyoom_banner.png)
 
-A quick and easy Flutter app that makes travelling around Singapore easier.
+*A quick and easy Flutter app that makes travelling around Singapore easier.*
 
 ## 💡 Features
 
@@ -19,20 +19,19 @@ A quick and easy Flutter app that makes travelling around Singapore easier.
 - Stay informed on other crucial updates.
 ### ⚙️ Miscellaneous
 - Light and Dark mode support.
-
+  
 ## ⭐ Credits & Acknowledgements
 
-**Main Contributors:**
+This is a recreation of the [original nyoom app](https://github.com/caleb1607/MADProject) (Java), rebuilt using Flutter for cross-platform support. This version does not include a login or account system. Some parts of the app have also been further optimised.
 
+**Original Nyoom App Contributors:**
 - Shaun (Main UI Designer)
 - Bryan (Bus Arrival Times Functionality & Authorisation)
 - Aqil (UI, Announcements & Database)
 - Caleb (Travel Routes Functionality)
 
-**Other Acknowledgements:**
-
+**Resources & APIs Used:**
 - [LTA DataMall API](https://datamall.lta.gov.sg/content/datamall/en.html)
-- [ourhound](https://ourhound.com/transportations-tips-travelling-around-Singapore) (Icons & Images) 
-- [cheeaun/sgraildata](https://github.com/cheeaun/sgraildata) (Datasets Used)
+- [Onemap API](https://www.onemap.gov.sg/apidocs/)
 
 ---
